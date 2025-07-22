@@ -11,7 +11,7 @@ class BloqueoKgMaterialSeeder extends Seeder {
         Bloqueo_Kg_Material::insert([
             [
                 'material_id' => 1,
-                'usaurio_id' => 4,
+                'usaurio_id' => 1,
                 'tipo_proveedor_id' => 1,
                 'cantidad' => 100,
                 'inicio' => now(),

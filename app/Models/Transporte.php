@@ -9,7 +9,6 @@ class Transporte extends Model
 {
     /** @use HasFactory<\Database\Factories\TransportFactory> */
     use HasFactory;
-    protected $table = 'transportes';
 
     protected $primaryKey = 'transporte_id';
 
