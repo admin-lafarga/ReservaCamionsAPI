@@ -25,7 +25,7 @@ use App\Http\Controllers\AuthController;
 
 Route::get('/', function (Request $request) {
     return response()->json([
-        'message' => 'Welcome to the LaFargaNet Localhost API',
+        'message' => 'Welcome to the ReservaCamions Localhost API',
         'ip' => $request->getClientIp(),
     ], 200);
 });

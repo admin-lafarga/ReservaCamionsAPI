@@ -12,7 +12,7 @@ class BloqueoCamionMaterialSeeder extends Seeder {
             [
                 'proveedor_id' => 1,
                 'material_id' => 1,
-                'usuario_id' => 4, //canviar a 1, en el cas que es torni a construir tot de nou.
+                'usuario_id' => 1, //canviar a 1, en el cas que es torni a construir tot de nou.
                 'inicio' => now(),
                 'fin' => now()->addHours(2),
                 'cantidad' => 50
