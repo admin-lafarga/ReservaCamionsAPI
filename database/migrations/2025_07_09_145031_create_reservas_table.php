@@ -15,26 +15,26 @@ return new class extends Migration
             $table->id('reserva_id');
             $table->unsignedBigInteger('tipo_camion_id');
             $table->unsignedBigInteger('tipo_material1_id');
-            $table->unsignedBigInteger('tipo_material2_id');
+            $table->unsignedBigInteger('tipo_material2_id')->nullable();
             $table->unsignedBigInteger('proveedor_id');
             $table->unsignedBigInteger('transporte_id');
             $table->unsignedBigInteger('muelle1_id');
-            $table->unsignedBigInteger('muelle2_id');
+            $table->unsignedBigInteger('muelle2_id')->nullable();;
             $table->unsignedBigInteger('status_id');
             $table->unsignedBigInteger('empresa_id');
             $table->integer('cantidad1');
-            $table->integer('cantidad2');
+            $table->integer('cantidad2')->nullable();;
             $table->string('pedido_LF');
             $table->string('matricula_camion');
             $table->dateTime('inicio1');
-            $table->dateTime('fin1')->nullable();
-            $table->dateTime('inicio2');
+            $table->dateTime('fin1');
+            $table->dateTime('inicio2')->nullable();;
             $table->dateTime('fin2')->nullable();
             $table->boolean('es_aduana')->default(false);
             $table->string('notas')->nullable();
             $table->string('tel1')->nullable();
             $table->integer('duracion1');
-            $table->integer('duracion2');
+            $table->integer('duracion2')->nullable();;
 
             $table->timestamps();
 

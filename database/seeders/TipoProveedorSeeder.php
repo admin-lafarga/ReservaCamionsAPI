@@ -4,11 +4,11 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Tipo_Proveedor;
+use App\Models\TipoProveedor;
 
 class TipoProveedorSeeder extends Seeder {
     public function run(): void {
-        Tipo_Proveedor::insert([
+        TipoProveedor::insert([
             ['nombre' => 'Intern'],
             ['nombre' => 'Extern']
         ]);

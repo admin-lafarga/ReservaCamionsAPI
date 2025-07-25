@@ -4,11 +4,11 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Bloqueo_Camion_Material;
+use App\Models\BloqueoCamionMaterial;
 
 class BloqueoCamionMaterialSeeder extends Seeder {
     public function run(): void {
-        Bloqueo_Camion_Material::insert([
+        BloqueoCamionMaterial::insert([
             [
                 'proveedor_id' => 1,
                 'material_id' => 1,

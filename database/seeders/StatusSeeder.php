@@ -9,7 +9,26 @@ use App\Models\Status;
 class StatusSeeder extends Seeder {
     public function run(): void {
         Status::insert([
-            ['nombre' => 'Pendent', 'descripcion' => 'En espera de confirmació', 'estado' => 1]
+            [
+                'nombre' => 'Pendiente',
+                'descripcion' => '',
+                'estado' => 1
+            ],
+            [
+                'nombre' => 'Finalizada',
+                'descripcion' => '',
+                'estado' => 1
+            ],
+            [
+                'nombre' => 'No asistió',
+                'descripcion' => '',
+                'estado' => 1
+            ],
+            [
+                'nombre' => 'Cancelada',
+                'descripcion' => '',
+                'estado' => 1
+            ]
         ]);
     }
 }

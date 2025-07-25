@@ -20,6 +20,7 @@ use App\Http\Controllers\RestriccionController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\Horarios_MuelleController;
+use App\Http\Controllers\ControlMaterialMuelleController;
 use App\Http\Controllers\PrivilegioController;
 use App\Http\Controllers\AuthController;
 
@@ -41,9 +42,10 @@ Route::post('/register', [AuthController::class, 'register']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // API CRUD RESOURCES
+    Route::post('controlCamion', [ControlMaterialMuelleController::class, 'materialCamioMuelle']);
     Route::apiResource('users', UserController::class);
     Route::apiResource('proveedores', ProveedorController::class);
-    Route::apiResource('transportes', TransporteController::class);
+    Route::apiResource('transportistas', TransporteController::class);
     Route::apiResource('tipo_proveedor', Tipo_ProveedorController::class);
     Route::apiResource('tipo_camion', Tipo_CamionController::class);
     Route::apiResource('tipo_muelle', Tipo_MuelleController::class);

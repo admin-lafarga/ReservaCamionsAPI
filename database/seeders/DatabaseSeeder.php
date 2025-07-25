@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             BloqueoKgMaterialSeeder::class,
             PrivilegioSeeder::class,
             ReservaSeeder::class,
+            ControlMaterialMuelleSeeder::class
         ]);
     }
 }

@@ -4,11 +4,11 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Horario_Muelle;
+use App\Models\HorarioMuelle;
 
 class HorarioMuelleSeeder extends Seeder {
     public function run(): void {
-        Horario_Muelle::insert([
+        HorarioMuelle::insert([
             [
                 'muelle_id' => 1,
                 'dia' => 'Dilluns',

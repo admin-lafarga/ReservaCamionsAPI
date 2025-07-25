@@ -4,11 +4,11 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Bloqueo_Kg_Material;
+use App\Models\BloqueoKgMaterial;
 
 class BloqueoKgMaterialSeeder extends Seeder {
     public function run(): void {
-        Bloqueo_Kg_Material::insert([
+        BloqueoKgMaterial::insert([
             [
                 'material_id' => 1,
                 'usaurio_id' => 1,

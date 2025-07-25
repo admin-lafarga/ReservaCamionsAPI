@@ -30,7 +30,37 @@ class ReservaController extends Controller
      */
     public function store(StoreReservaRequest $request)
     {
-        //
+        $validatedData = $request->validated();
+
+        $reserva = Reserva::create([
+            'tipo_camion_id'      => $validatedData['tipo_camion_id'],
+            'tipo_material1_id'   => $validatedData['tipo_material1_id'],
+            'tipo_material2_id'   => $validatedData['tipo_material2_id'] ?? null,
+            'proveedor_id'        => $validatedData['proveedor_id'],
+            'transporte_id'       => $validatedData['transporte_id'],
+            'muelle1_id'          => $validatedData['muelle1_id'],
+            'muelle2_id'          => $validatedData['muelle2_id'] ?? null,
+            'status_id'           => $validatedData['status_id'],
+            'empresa_id'          => 1,
+            'cantidad1'           => $validatedData['cantidad1'],
+            'cantidad2'           => $validatedData['cantidad2'] ?? null,
+            'pedido_LF'           => $validatedData['pedido_LF'] ?? null,
+            'matricula_camion'    => $validatedData['matricula_camion'],
+            'inicio1'             => $validatedData['inicio1'],
+            'fin1'                => $validatedData['fin1'],
+            'inicio2'             => $validatedData['inicio2'] ?? null,
+            'fin2'                => $validatedData['fin2'] ?? null,
+            'es_aduana'           => $validatedData['es_aduana'] ?? false,
+            'notas'               => $validatedData['notas'] ?? null,
+            'tel1'                => $validatedData['tel1'] ?? null,
+            'duracion1'           => $validatedData['duracion1'],
+            'duracion2'           => $validatedData['duracion2'] ?? null,
+        ]);
+
+        return response()->json([
+            'message' => 'Reserva creada correctament.',
+            'data' => $reserva
+        ], 201);
     }
 
     /**
