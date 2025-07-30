@@ -43,6 +43,8 @@ class StoreReservaRequest extends FormRequest
             'tel1'                => ['nullable', 'string', 'max:50'],
             'duracion1'           => ['required', 'numeric', 'min:0'],
             'duracion2'           => ['nullable', 'numeric', 'min:0'],
+            'archivos' => ['nullable', 'array'],
+            'archivos.*' => ['file', 'max:5120'],
         ];
     }
 }
