@@ -39,7 +39,7 @@ Route::get('test', function(){
     return 'exitos';
 })->middleware('auth:sanctum');
 
-Route::post('/login', [AuthController::class, 'login2'])->middleware('guest');
+Route::post('/login', [AuthController::class, 'login2'])->middleware('web');
 // Route::post('/login', [AuthController::class, 'login']);
 
 // TERMPORALMENT #############################################

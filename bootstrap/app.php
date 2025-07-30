@@ -17,11 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
-        $middleware->group('api', [
-        StartSession::class,
-        'throttle:60,1',
-        SubstituteBindings::class,
-    ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
