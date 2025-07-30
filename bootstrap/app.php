@@ -1,30 +1,28 @@
 <?php
 
 use Illuminate\Foundation\Application;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-// use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
+        web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
         apiPrefix: 'api',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // $middleware->append(StartSession::class);
-        // $middleware->statefulApi();
+        $middleware->statefulApi();
+        $middleware->group('api', [
+        StartSession::class,
+        'throttle:60,1',
+        SubstituteBindings::class,
+    ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->renderable(function (Illuminate\Auth\AuthenticationException $e, $request) {
-            // return response()->json([
-            //     'message' => 'Ressource not found',
-            // ], 404);
-        });
-
-        $exceptions->renderable(function (Symfony\Component\Routing\Exception\RouteNotFoundException $e, $request) {
-            // return response()->json([
-            //     'message' => 'Ressource not found',
-            // ], 404);
-        });
-    })
-    ->create();
+        //
+    })->create();

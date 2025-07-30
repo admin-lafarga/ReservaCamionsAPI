@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreTipo_CamionRequest;
-use App\Http\Requests\UpdateTipo_CamionRequest;
-use App\Models\Tipo_Camion;
+use App\Http\Requests\StoreTipoCamionRequest;
+use App\Http\Requests\UpdateTipoCamionRequest;
+use App\Models\TipoCamion;
 
 class TipoCamionController extends Controller
 {
@@ -13,7 +13,7 @@ class TipoCamionController extends Controller
      */
     public function index()
     {
-        $tiposCamion = Tipo_Camion::all();
+        $tiposCamion = TipoCamion::all();
         return response()->json($tiposCamion);
     }
 
@@ -28,7 +28,7 @@ class TipoCamionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTipo_CamionRequest $request)
+    public function store(StoreTipoCamionRequest $request)
     {
         //
     }
@@ -36,7 +36,7 @@ class TipoCamionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Tipo_Camion $tipus_Camio)
+    public function show(TipoCamion $tipusCamio)
     {
         //
     }
@@ -44,7 +44,7 @@ class TipoCamionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Tipo_Camion $tipus_Camio)
+    public function edit(TipoCamion $tipusCamio)
     {
         //
     }
@@ -52,7 +52,7 @@ class TipoCamionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTipo_CamionRequest $request, Tipo_Camion $tipus_Camio)
+    public function update(UpdateTipoCamionRequest $request, TipoCamion $tipusCamio)
     {
         //
     }
@@ -60,7 +60,7 @@ class TipoCamionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tipo_Camion $tipus_Camio)
+    public function destroy(TipoCamion $tipusCamio)
     {
         //
     }

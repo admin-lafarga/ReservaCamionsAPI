@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreBloqueo_Camion_MaterialRequest;
-use App\Http\Requests\UpdateBloqueo_Camion_MaterialRequest;
-use App\Models\Bloqueo_Camion_Material;
+use App\Http\Requests\StoreBloqueoCamionMaterialRequest;
+use App\Http\Requests\UpdateBloqueoCamionMaterialRequest;
+use App\Models\BloqueoCamionMaterial;
 
-class Bloqueo_Camion_MaterialController extends Controller
+class BloqueoCamionMaterialController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $bloqueoCamionesMateriales = Bloqueo_Camion_Material::all();
+        $bloqueoCamionesMateriales = BloqueoCamionMaterial::all();
         return response()->json($bloqueoCamionesMateriales);
     }
 
@@ -28,7 +28,7 @@ class Bloqueo_Camion_MaterialController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreBloqueo_Camion_MaterialRequest $request)
+    public function store(StoreBloqueoCamionMaterialRequest $request)
     {
         //
     }
@@ -36,7 +36,7 @@ class Bloqueo_Camion_MaterialController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Bloqueo_Camion_Material $bloqueig_Camio_Material)
+    public function show(BloqueoCamionMaterial $bloqueigCamioMaterial)
     {
         //
     }
@@ -44,7 +44,7 @@ class Bloqueo_Camion_MaterialController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Bloqueo_Camion_Material $bloqueig_Camio_Material)
+    public function edit(BloqueoCamionMaterial $bloqueigCamioMaterial)
     {
         //
     }
@@ -52,7 +52,7 @@ class Bloqueo_Camion_MaterialController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBloqueo_Camion_MaterialRequest $request, Bloqueo_Camion_Material $bloqueig_Camio_Material)
+    public function update(UpdateBloqueoCamionMaterialRequest $request, BloqueoCamionMaterial $bloqueigCamioMaterial)
     {
         //
     }
@@ -60,7 +60,7 @@ class Bloqueo_Camion_MaterialController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Bloqueo_Camion_Material $bloqueig_Camio_Material)
+    public function destroy(BloqueoCamionMaterial $bloqueigCamioMaterial)
     {
         //
     }

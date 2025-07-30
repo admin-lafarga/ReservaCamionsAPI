@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreBloqueo_Kg_MaterialRequest;
-use App\Http\Requests\UpdateBloqueo_Kg_MaterialRequest;
-use App\Models\Bloqueo_Kg_Material;
+use App\Http\Requests\StoreBloqueoKgMaterialRequest;
+use App\Http\Requests\UpdateBloqueoKgMaterialRequest;
+use App\Models\BloqueoKgMaterial;
 
 class BloqueoKgMaterialController extends Controller
 {
@@ -13,7 +13,7 @@ class BloqueoKgMaterialController extends Controller
      */
     public function index()
     {
-        $bloqueosKgMaterial = Bloqueo_Kg_Material::all();
+        $bloqueosKgMaterial = BloqueoKgMaterial::all();
         return response()->json($users);
     }
 
@@ -28,7 +28,7 @@ class BloqueoKgMaterialController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreBloqueo_Kg_MaterialRequest $request)
+    public function store(StoreBloqueoKgMaterialRequest $request)
     {
         //
     }
@@ -36,7 +36,7 @@ class BloqueoKgMaterialController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Bloqueo_Kg_Material $bloqueig_KG_Material)
+    public function show(BloqueoKgMaterial $bloqueigKGMaterial)
     {
         //
     }
@@ -44,7 +44,7 @@ class BloqueoKgMaterialController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Bloqueo_Kg_Material $bloqueig_KG_Material)
+    public function edit(BloqueoKgMaterial $bloqueigKGMaterial)
     {
         //
     }
@@ -52,7 +52,7 @@ class BloqueoKgMaterialController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBloqueo_Kg_MaterialRequest $request, Bloqueo_Kg_Material $bloqueig_KG_Material)
+    public function update(UpdateBloqueoKgMaterialRequest $request, BloqueoKgMaterial $bloqueigKGMaterial)
     {
         //
     }
@@ -60,7 +60,7 @@ class BloqueoKgMaterialController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Bloqueo_Kg_Material $bloqueig_KG_Material)
+    public function destroy(BloqueoKgMaterial $bloqueigKGMaterial)
     {
         //
     }
