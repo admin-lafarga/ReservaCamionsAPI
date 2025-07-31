@@ -38,7 +38,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('web');
 
 // TERMPORALMENT #############################################
 Route::post('/register', [AuthController::class, 'register']);

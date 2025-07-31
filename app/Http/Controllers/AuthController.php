@@ -65,6 +65,9 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
+        $request->session()->regenerate();
+
+
         return response()->json([
             'message' => 'Login correcte',
             'user' => $user,
