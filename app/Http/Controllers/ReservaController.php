@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreReservaRequest;
 use App\Http\Requests\UpdateReservaRequest;
 use App\Models\Reserva;
+use App\Models\DocumentosReserva;
 
 class ReservaController extends Controller
 {
@@ -14,7 +15,7 @@ class ReservaController extends Controller
      */
     public function index()
     {
-        $reservas = Reserva::all();
+        $reservas = Reserva::with('documentos')->get();
         return response()->json($reservas);
     }
 
@@ -60,22 +61,16 @@ class ReservaController extends Controller
         ]);
 
         // AMB MODELS
-        // if ($request->hasFile('archivos')) {
-        //     foreach ($request->file('archivos') as $archivo) {
-        //         $ruta = $archivo->store("reservas/{$reserva->id}");
-
-        //         $reserva->archivos()->create([
-        //             'ruta' => $ruta,
-        //             'nombre' => $archivo->getClientOriginalName(),
-        //         ]);
-        //     }
-        // }
-
-        // SENSE MODELS
         if ($request->hasFile('archivos')) {
             foreach ($request->file('archivos') as $archivo) {
+                $ruta = $archivo->store("reservas{$reserva->id}");
+
                 $nombreOriginal = $archivo->getClientOriginalName();
-                $archivo->storeAs("reservas/{$reserva->id}", $nombreOriginal);
+
+                $reserva->documentos()->create([
+                    'url' => $ruta,
+                    'name' => $nombreOriginal
+                ]);
             }
         }
 

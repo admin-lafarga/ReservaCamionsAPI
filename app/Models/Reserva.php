@@ -86,4 +86,9 @@ class Reserva extends Model
     {
         return $this->belongsTo(Empresa::class, 'empresa_id');
     }
+
+    public function documentos()
+    {
+        return $this->hasMany(DocumentosReserva::class, 'reserva_id');
+    }
 }
