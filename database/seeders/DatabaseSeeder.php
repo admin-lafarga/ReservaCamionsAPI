@@ -30,10 +30,10 @@ class DatabaseSeeder extends Seeder
             StatusSeeder::class,
             RestriccionSeeder::class,
             BloqueoCamionMaterialSeeder::class,
-            BloqueoKgMaterialSeeder::class,
             PrivilegioSeeder::class,
             ReservaSeeder::class,
-            ControlMaterialMuelleSeeder::class
+            ControlMaterialMuelleSeeder::class,
+            BloqueoGrupoDetalleSeeder::class
         ]);
     }
 }

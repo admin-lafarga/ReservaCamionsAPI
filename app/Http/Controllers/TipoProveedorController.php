@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreTipo_ProveedorRequest;
-use App\Http\Requests\UpdateTipo_ProveedorRequest;
-use App\Models\Tipo_Proveedor;
+use App\Http\Requests\StoreTipoProveedorRequest;
+use App\Http\Requests\UpdateTipoProveedorRequest;
+use App\Models\TipoProveedor;
 
 class TipoProveedorController extends Controller
 {
@@ -13,7 +13,7 @@ class TipoProveedorController extends Controller
      */
     public function index()
     {
-        $tiposProveidor = Tipo_Proveedor::all();
+        $tiposProveidor = TipoProveedor::all();
         return response()->json($tiposProveidor);
     }
 
@@ -28,7 +28,7 @@ class TipoProveedorController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTipo_ProveedorRequest $request)
+    public function store(StoreTipoProveedorRequest $request)
     {
         //
     }
@@ -36,7 +36,7 @@ class TipoProveedorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Tipo_Proveedor $tipus_Proveidor)
+    public function show(TipoProveedor $tipus_Proveidor)
     {
         //
     }
@@ -44,7 +44,7 @@ class TipoProveedorController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Tipo_Proveedor $tipus_Proveidor)
+    public function edit(TipoProveedor $tipus_Proveidor)
     {
         //
     }
@@ -52,7 +52,7 @@ class TipoProveedorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTipo_ProveedorRequest $request, Tipo_Proveedor $tipus_Proveidor)
+    public function update(UpdateTipoProveedorRequest $request, TipoProveedor $tipus_Proveidor)
     {
         //
     }
@@ -60,7 +60,7 @@ class TipoProveedorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tipo_Proveedor $tipus_Proveidor)
+    public function destroy(TipoProveedor $tipus_Proveidor)
     {
         //
     }
