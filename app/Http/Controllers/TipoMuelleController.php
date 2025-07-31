@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreTipo_MuelleRequest;
-use App\Http\Requests\UpdateTipo_MuelleRequest;
-use App\Models\Tipo_Muelle;
+use App\Http\Requests\StoreTipoMuelleRequest;
+use App\Http\Requests\UpdateTipoMuelleRequest;
+use App\Models\TipoMuelle;
 
 class TipoMuelleController extends Controller
 {
@@ -13,7 +13,7 @@ class TipoMuelleController extends Controller
      */
     public function index()
     {
-        $tiposMuelle = Tipo_Muelle::all();
+        $tiposMuelle = TipoMuelle::all();
         return response()->json($tiposMuelle);
     }
 
@@ -28,7 +28,7 @@ class TipoMuelleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTipo_MuelleRequest $request)
+    public function store(StoreTipoMuelleRequest $request)
     {
         //
     }
@@ -36,7 +36,7 @@ class TipoMuelleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Tipo_Muelle $tipus_Moll)
+    public function show(TipoMuelle $tipusMoll)
     {
         //
     }
@@ -44,7 +44,7 @@ class TipoMuelleController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Tipo_Muelle $tipus_Moll)
+    public function edit(TipoMuelle $tipusMoll)
     {
         //
     }
@@ -52,7 +52,7 @@ class TipoMuelleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTipo_MuelleRequest $request, Tipo_Muelle $tipus_Moll)
+    public function update(UpdateTipoMuelleRequest $request, TipoMuelle $tipusMoll)
     {
         //
     }
@@ -60,7 +60,7 @@ class TipoMuelleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tipo_Muelle $tipus_Moll)
+    public function destroy(TipoMuelle $tipusMoll)
     {
         //
     }

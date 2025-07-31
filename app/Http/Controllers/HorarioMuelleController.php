@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreHorarios_MuelleRequest;
-use App\Http\Requests\UpdateHorarios_MuelleRequest;
-use App\Models\Horarios_Muelle;
+use App\Http\Requests\StoreHorarioMuelleRequest;
+use App\Http\Requests\UpdateHorarioMuelleRequest;
+use App\Models\HorarioMuelle;
 
-class HorariosMuelleController extends Controller
+class HorarioMuelleController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $horariosMuelle = Horarios_Muelle::all();
+        $horariosMuelle = HorarioMuelle::all();
         return response()->json($horariosMuelle);
     }
 
@@ -28,7 +28,7 @@ class HorariosMuelleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreHorarios_MuelleRequest $request)
+    public function store(StoreHorarioMuelleRequest $request)
     {
         //
     }
@@ -36,7 +36,7 @@ class HorariosMuelleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Horarios_Muelle $moll_Horari)
+    public function show(HorarioMuelle $moll_Horari)
     {
         //
     }
@@ -44,7 +44,7 @@ class HorariosMuelleController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Horarios_Muelle $moll_Horari)
+    public function edit(HorarioMuelle $moll_Horari)
     {
         //
     }
@@ -52,7 +52,7 @@ class HorariosMuelleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateHorarios_MuelleRequest $request, Horarios_Muelle $moll_Horari)
+    public function update(UpdateHorarioMuelleRequest $request, Horarios_Muelle $moll_Horari)
     {
         //
     }
@@ -60,7 +60,7 @@ class HorariosMuelleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Horarios_Muelle $moll_Horari)
+    public function destroy(HorarioMuelle $moll_Horari)
     {
         //
     }

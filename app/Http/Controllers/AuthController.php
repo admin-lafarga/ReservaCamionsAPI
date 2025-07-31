@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 
 class AuthController extends Controller
@@ -67,6 +68,23 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Login correcte',
             'user' => $user,
+        ]);
+    }
+
+    public function login2(Request $request) {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+        
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+
+            return response()->json(['message' => __('Welcome!')]);
+        }
+
+        throw ValidationException::withMessages([
+            'email' => __('Bad credentials!'),
         ]);
     }
 

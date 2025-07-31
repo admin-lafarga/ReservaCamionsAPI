@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreTipo_MaterialRequest;
-use App\Http\Requests\UpdateTipo_MaterialRequest;
-use App\Models\Tipo_Material;
+use App\Http\Requests\StoreTipoMaterialRequest;
+use App\Http\Requests\UpdateTipoMaterialRequest;
+use App\Models\TipoMaterial;
 
 class TipoMaterialController extends Controller
 {
@@ -13,7 +13,7 @@ class TipoMaterialController extends Controller
      */
     public function index()
     {
-        $tiposMaterial = Tipo_Material::all();
+        $tiposMaterial = TipoMaterial::all();
         return response()->json($tiposMaterial);
     }
 
@@ -28,7 +28,7 @@ class TipoMaterialController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTipo_MaterialRequest $request)
+    public function store(StoreTipoMaterialRequest $request)
     {
         //
     }
@@ -36,7 +36,7 @@ class TipoMaterialController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Tipo_Material $tipus_Material)
+    public function show(TipoMaterial $tipusMaterial)
     {
         //
     }
@@ -44,7 +44,7 @@ class TipoMaterialController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Tipo_Material $tipus_Material)
+    public function edit(TipoMaterial $tipusMaterial)
     {
         //
     }
@@ -52,7 +52,7 @@ class TipoMaterialController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTipo_MaterialRequest $request, Tipo_Material $tipus_Material)
+    public function update(UpdateTipoMaterialRequest $request, TipoMaterial $tipusMaterial)
     {
         //
     }
@@ -60,7 +60,7 @@ class TipoMaterialController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tipo_Material $tipus_Material)
+    public function destroy(TipoMaterial $tipusMaterial)
     {
         //
     }

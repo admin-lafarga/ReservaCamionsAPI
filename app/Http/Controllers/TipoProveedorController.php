@@ -36,7 +36,7 @@ class TipoProveedorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(TipoProveedor $tipus_Proveidor)
+    public function show(TipoProveedor $tipusProveidor)
     {
         //
     }
@@ -44,7 +44,7 @@ class TipoProveedorController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(TipoProveedor $tipus_Proveidor)
+    public function edit(TipoProveedor $tipusProveidor)
     {
         //
     }
@@ -52,7 +52,7 @@ class TipoProveedorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTipoProveedorRequest $request, TipoProveedor $tipus_Proveidor)
+    public function update(UpdateTipoProveedorRequest $request, TipoProveedor $tipusProveidor)
     {
         //
     }
@@ -60,7 +60,7 @@ class TipoProveedorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(TipoProveedor $tipus_Proveidor)
+    public function destroy(TipoProveedor $tipusProveidor)
     {
         //
     }
