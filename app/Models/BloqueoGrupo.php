@@ -18,7 +18,7 @@ class BloqueoGrupo extends Model
     }
 
     protected $fillable = [
-        'tipo_proveedor',
+        'tipo_proveedor_id',
         'cantidad_total',
         'cantidad_disponible',
         'fecha_desde',

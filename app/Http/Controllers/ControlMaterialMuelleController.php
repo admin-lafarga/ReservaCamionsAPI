@@ -57,7 +57,7 @@ class ControlMaterialMuelleController extends Controller
         $request->validate([
             'materiales' => 'required|array|min:1',
             'materiales.*' => 'integer|exists:materiales,material_id',
-            'restricciones' => 'boolean|required'
+            'restricciones' => 'boolean|nullable'
         ]);
 
         $materiales = $request->input('materiales');

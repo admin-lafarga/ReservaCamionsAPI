@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
-
 class AuthController extends Controller
 {
 
@@ -79,7 +78,7 @@ class AuthController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
-        
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
@@ -134,5 +133,10 @@ class AuthController extends Controller
             'token' => $token,
             'user' => $user,
         ], 201);
+    }
+
+    public function authenticated(Request $request)
+    {
+        return response()->json(auth()->check());
     }
 }

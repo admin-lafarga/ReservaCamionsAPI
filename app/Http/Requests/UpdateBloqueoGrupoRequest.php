@@ -11,7 +11,7 @@ class UpdateBloqueoGrupoRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,13 @@ class UpdateBloqueoGrupoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'cantidad_total' => 'required|numeric|min:1',
+            'cantidad_disponible' => 'required|numeric|min:0|lte:cantidad_total',
+            'fecha_desde' => 'required|date',
+            'fecha_hasta' => 'required|date|after_or_equal:fecha_desde',
+            'tipo_proveedor_id' => 'required|exists:tipo_proveedores,tipo_proveedor_id',
+            'detalles' => 'required|array|min:1',
+            'detalles.*.material_id' => 'required|exists:materiales,material_id',
         ];
     }
 }

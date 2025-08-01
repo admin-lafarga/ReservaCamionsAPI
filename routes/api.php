@@ -39,6 +39,7 @@ Route::get('/user', function (Request $request) {
 
 
 Route::post('/login', [AuthController::class, 'login'])->middleware('web');
+Route::get('/authenticated', [AuthController::class, 'authenticated']);
 
 // TERMPORALMENT #############################################
 Route::post('/register', [AuthController::class, 'register']);
@@ -53,10 +54,10 @@ Route::middleware(['auth:sanctum','web'])->group(function () {
     Route::apiResource('users', UserController::class);
     Route::apiResource('proveedores', ProveedorController::class);
     Route::apiResource('transportistas', TransporteController::class);
-    Route::apiResource('tipoproveedor', TipoProveedorController::class);
-    Route::apiResource('tipocamion', TipoCamionController::class);
-    Route::apiResource('tipomuelle', TipoMuelleController::class);
-    Route::apiResource('tipomaterial', TipoMaterialController::class);
+    Route::apiResource('tipoproveedores', TipoProveedorController::class);
+    Route::apiResource('tipocamiones', TipoCamionController::class);
+    Route::apiResource('tipomuelles', TipoMuelleController::class);
+    Route::apiResource('tipomateriales', TipoMaterialController::class);
     Route::apiResource('materiales', MaterialController::class);
     Route::apiResource('roles', RolController::class);
     Route::apiResource('restricciones', RestriccionController::class);
@@ -67,11 +68,11 @@ Route::middleware(['auth:sanctum','web'])->group(function () {
     Route::apiResource('muelle', MuelleController::class);
     Route::apiResource('reserva', ReservaController::class);
     Route::apiResource('privilegios', PrivilegioController::class);
-    Route::apiResource('bloqueo_grupos', BloqueoGrupoController::class);
+    Route::apiResource('bloqueo/grupos', BloqueoGrupoController::class);
     Route::apiResource('bloqueo/grupo/detalles', BloqueoGrupoDetalleController::class);
 
     Route::get('/columns/{table}', function ($table) {
-        $allowedTables = ['materiales', 'usuarios', 'proveedores','bloqueo_grupos'];
+        $allowedTables = ['materiales', 'usuarios', 'proveedores','bloqueo/grupos'];
         if (!in_array($table, $allowedTables)) {
             return response()->json(['error' => 'Taula no permesa'], 403);
         }
