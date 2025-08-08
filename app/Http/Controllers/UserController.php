@@ -6,6 +6,7 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -14,7 +15,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::with('rol')->get();
         return response()->json($users);
     }
 
@@ -29,9 +30,17 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreUserRequest $user)
+    public function store(StoreUserRequest $request)
     {
-        //
+        $data = $request->validated();
+        $data['password'] = Hash::make($data['password']);
+
+        $user = User::create($data);
+
+        return response()->json([
+            'message' => 'Usuario creado correctamente',
+            'data' => $user
+        ], 201);
     }
 
     /**
@@ -57,20 +66,17 @@ class UserController extends Controller
     {
         $data = $request->validated();
 
-        // Si hi ha password, hashem abans d'actualitzar
         if (!empty($data['password'])) {
-            $data['password'] = bcrypt($data['password']);
+            $data['password'] = Hash::make($data['password']);
         } else {
-            // Evitem sobreescriure el password si no s'envia
             unset($data['password']);
         }
 
         $user->update($data);
 
         return response()->json([
-            'message' => 'Usuari actualitzat correctament',
-            'user' => $user
-        ], 200);
+            'message' => 'Usuario actualizado correctamente',
+        ]);
     }
 
     /**
@@ -78,6 +84,17 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        try {
+            $user->delete();
+
+            return response()->json([
+                'message' => 'Usuario eliminado correctamente'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'No se pudo eliminar el usuario',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

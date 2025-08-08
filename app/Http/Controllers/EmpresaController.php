@@ -30,7 +30,11 @@ class EmpresaController extends Controller
      */
     public function store(StoreEmpresaRequest $request)
     {
-        //
+        $empresa = Empresa::create($request->validated());
+
+        return response()->json([
+            'message' => 'Empresa creado correctamente.'
+        ], 201);
     }
 
     /**
@@ -54,7 +58,11 @@ class EmpresaController extends Controller
      */
     public function update(UpdateEmpresaRequest $request, Empresa $empresa)
     {
-        //
+        $empresa->update($request->validated());
+
+        return response()->json([
+            'message' => 'Empresa actualizado correctamente.',
+        ]);
     }
 
     /**

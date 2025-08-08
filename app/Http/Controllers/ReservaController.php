@@ -25,6 +25,7 @@ class ReservaController extends Controller
             'tipoCamion:tipo_camion_id,nombre',
             'material:material_id,nombre_material',
             'material1:material_id,nombre_material',
+            'muelle1'
         ])->get();
 
         return response()->json($reservas);

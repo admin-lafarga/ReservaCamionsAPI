@@ -25,12 +25,19 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = $this->route('user')?->id;
+
         return [
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|max:255|unique:users,email,' . $this->route('user')->id,
-                'password' => 'nullable|string|min:8',
-                'pin' => 'nullable|string|max:10',
-                'tel1' => 'nullable|string|max:20',
+            'name' => 'required|string|max:255|unique:users,name,'. $userId . ',id',
+            'username' => 'required|string|max:255|unique:users,username,'. $userId . ',id',
+            'apellidos' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,'. $userId . ',id',
+            'password' => 'nullable|string|min:8',
+            'PIN' => 'required|string|max:10|unique:users,PIN,'. $userId . ',id',
+            'NIF' => 'nullable|string|max:20',
+            'tel1' => 'nullable|string|max:50',
+            'rol_id' => 'required|exists:roles,rol_id',
+            'estado' => 'required|boolean',
         ];
     }
 }

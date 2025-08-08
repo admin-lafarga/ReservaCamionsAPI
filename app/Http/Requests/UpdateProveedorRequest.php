@@ -21,7 +21,7 @@ class UpdateProveedorRequest extends FormRequest
      */
     public function rules(): array
     {
-        $proveedorId = $this->route('proveedore')?->proveedor_id
+        $proveedorId = $this->route('proveedore')?->proveedor_id;
 
         return [
             'tipo_proveedor_id' => 'required|exists:tipo_proveedores,tipo_proveedor_id',

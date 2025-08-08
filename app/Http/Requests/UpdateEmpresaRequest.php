@@ -11,7 +11,7 @@ class UpdateEmpresaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true ;
     }
 
     /**
@@ -21,8 +21,12 @@ class UpdateEmpresaRequest extends FormRequest
      */
     public function rules(): array
     {
+        $empresaID = $this->route('empresas')?->empresa_id;
+
         return [
-            //
+            'nombre' => 'required|string|max:255|unique:empresas,nombre,' . $empresaID . ',empresa_id',
+            'descripcion' => 'required|string|max:255',
+            'estado' => 'required|boolean',
         ];
     }
 }

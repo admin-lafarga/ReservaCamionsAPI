@@ -11,7 +11,7 @@ class StoreUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,16 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name'       => 'required|string|max:255',
+            'apellidos'  => 'required|string|max:255',
+            'username'  => 'required|string|max:255',
+            'email'      => 'required|string|email|max:255|unique:users,email',
+            'password'   => 'required|string|min:8',
+            'PIN'        => 'required|string|max:10|unique:users,PIN',
+            'NIF'        => 'nullable|string|max:20',
+            'tel1'       => 'nullable|string|max:50',
+            'rol_id'     => 'required|exists:roles,rol_id',
+            'estado'     => 'required|boolean',
         ];
     }
 }
