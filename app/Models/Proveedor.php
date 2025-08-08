@@ -11,6 +11,7 @@ class Proveedor extends Model
     use HasFactory;
 
     protected $table = 'proveedores';
+    
     protected $primaryKey = 'proveedor_id';
 
     public function getRouteKeyName()
@@ -34,20 +35,15 @@ class Proveedor extends Model
         'tipo_proveedor_id'
     ];
 
-    protected $hidden = [
-        'NIF',
-        'PIN'
-    ];
-
     public function tipoProveedor()
     {
-        return $this->belongsTo(Tipo_Proveedor::class, 'tipo_proveedor_id');
+        return $this->belongsTo(TipoProveedor::class, 'tipo_proveedor_id');
     }
 
-    public function bloqueosCamionMaterial()
-    {
-        return $this->hasMany(Bloqueo_Camion_Material::class, 'proveedor_id');
-    }
+    // public function bloqueosCamionMaterial()
+    // {
+    //     return $this->hasMany(BloqueoCamionMaterial::class, 'proveedor_id');
+    // }
 
     public function reservas()
     {

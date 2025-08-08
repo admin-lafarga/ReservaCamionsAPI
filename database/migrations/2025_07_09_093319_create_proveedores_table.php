@@ -24,8 +24,8 @@ return new class extends Migration
             $table->string('notificaciones_email');
             $table->string('tel1');
             $table->string('tel2');
-            $table->string('alerta');
-            $table->string('estado');
+            $table->boolean('alerta')->default(false);
+            $table->boolean('estado')->default(false);
 
             $table->timestamps();
 

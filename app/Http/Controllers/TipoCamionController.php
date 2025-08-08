@@ -36,15 +36,21 @@ class TipoCamionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(TipoCamion $tipusCamio)
+    public function show($id)
     {
-        //
+        $tipoCamion = TipoCamion::find($id);
+
+        if (!$tipoCamion) {
+            return response()->json(['message' => 'No trobat'], 404);
+        }
+
+        return response()->json($tipoCamion);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(TipoCamion $tipusCamio)
+    public function edit(TipoCamion $tipocamiones)
     {
         //
     }
@@ -52,7 +58,7 @@ class TipoCamionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTipoCamionRequest $request, TipoCamion $tipusCamio)
+    public function update(UpdateTipoCamionRequest $request, TipoCamion $tipocamiones)
     {
         //
     }

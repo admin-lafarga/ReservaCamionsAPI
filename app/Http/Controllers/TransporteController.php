@@ -13,7 +13,7 @@ class TransporteController extends Controller
      */
     public function index()
     {
-        $transportes = Transporte::all();
+        $transportes = Transporte::with('proveedor')->get();
         return response()->json($transportes);
     }
 
@@ -30,21 +30,30 @@ class TransporteController extends Controller
      */
     public function store(StoreTransporteRequest $request)
     {
-        //
+        Transporte::create($request->validated());
+        return response()->json([
+            'message' => 'Transportista creado correctamente.'
+        ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Transporte $transport)
+    public function show($id)
     {
-        //
+        $transporte = Transporte::find($id);
+
+        if (!$transporte) {
+            return response()->json(['message' => 'No trobat'], 404);
+        }
+
+        return response()->json($transporte);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Transporte $transport)
+    public function edit(Transporte $transportista)
     {
         //
     }
@@ -52,15 +61,19 @@ class TransporteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTransporteRequest $request, Transporte $transport)
+    public function update(UpdateTransporteRequest $request, Transporte $transportista)
     {
-        //
+        $transportista->update($request->validated());
+
+        return response()->json([
+            'message' => 'Transportista actualizado correctamente.',
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Transporte $transport)
+    public function destroy(Transporte $transportista)
     {
         //
     }

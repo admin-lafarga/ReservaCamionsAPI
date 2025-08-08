@@ -23,6 +23,7 @@ class TipoMaterial extends Model
         'tiempoD',
         'estado'
     ];
+    
     public function reservasComoTipo1()
     {
         return $this->hasMany(Reserva::class, 'tipo_material1_id');

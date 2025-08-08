@@ -34,8 +34,8 @@ class ReservaSeeder extends Seeder {
             ],
             [
                 'tipo_camion_id' => 1,
-                'tipo_material1_id' => 2,
-                'tipo_material2_id' => 3,
+                'tipo_material1_id' => 1,
+                'tipo_material2_id' => 2,
                 'proveedor_id' => 1,
                 'transporte_id' => 1,
                 'muelle1_id' => 2,

@@ -11,7 +11,7 @@ class StoreMuelleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,15 @@ class StoreMuelleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'descripcion' => 'required|string|max:255',
+            'zona' => 'required|string|max:255',
+            'nombre_muelle' => 'required|string|max:255|unique:muelles,nombre_muelle',
+            'color' => 'required|string|max:255',
+            'numero' => 'required|numeric|max:255|unique:muelles,numero',
+            'estado' => 'required|boolean',
+            'abierto_festivos' => 'required|boolean',
+            'cantidad_acceptada' => 'required|numeric',
+            'empresa_id' => 'required|exists:empresas,empresa_id',
         ];
     }
 }

@@ -27,13 +27,13 @@ class Material extends Model
         'max_concurrencia',
     ];
 
-    public function bloqueosCamionMaterial()
+    public function controlMaterialMuelle()
     {
-        return $this->hasMany(Bloqueo_Camion_Material::class, 'material_id');
+        return $this->hasMany(ControlMaterialMuelle::class, 'material_id');
     }
 
     public function bloqueosKgMaterial()
     {
-        return $this->hasMany(Bloqueo_Kg_Material::class, 'material_id');
+        return $this->hasMany(BloqueoKgMaterial::class, 'material_id');
     }
 }

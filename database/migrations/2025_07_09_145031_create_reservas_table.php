@@ -40,8 +40,8 @@ return new class extends Migration
 
             $table->foreign('tipo_camion_id')->references('tipo_camion_id')->on('tipo_camiones')->onDelete('cascade');
 
-            $table->foreign('tipo_material1_id')->references('tipo_material_id')->on('tipo_materiales')->onDelete('cascade');
-            $table->foreign('tipo_material2_id')->references('tipo_material_id')->on('tipo_materiales')->onDelete('cascade');
+            $table->foreign('tipo_material1_id')->references('material_id')->on('materiales')->onDelete('cascade');
+            $table->foreign('tipo_material2_id')->references('material_id')->on('materiales')->onDelete('cascade');
 
             $table->foreign('proveedor_id')->references('proveedor_id')->on('proveedores')->onDelete('cascade');
 

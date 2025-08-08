@@ -13,7 +13,7 @@ class MuelleController extends Controller
      */
     public function index()
     {
-        $muelles = Muelle::all();
+        $muelles = Muelle::with('empresa:empresa_id,nombre')->get();
         return response()->json($muelles);
     }
 
@@ -30,13 +30,17 @@ class MuelleController extends Controller
      */
     public function store(StoreMuelleRequest $request)
     {
-        //
+        $muelle = Muelle::create($request->validated());
+
+        return response()->json([
+            'message' => 'Muelle creado correctamente.'
+        ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Muelle $moll)
+    public function show(Muelle $muelle)
     {
         //
     }
@@ -44,7 +48,7 @@ class MuelleController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Muelle $moll)
+    public function edit(Muelle $muelle)
     {
         //
     }
@@ -52,15 +56,19 @@ class MuelleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateMuelleRequest $request, Muelle $moll)
+    public function update(UpdateMuelleRequest $request, Muelle $muelle)
     {
-        //
+        $muelle->update($request->validated());
+
+        return response()->json([
+            'message' => 'Muelle actualizado correctamente',
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Muelle $moll)
+    public function destroy(Muelle $muelle)
     {
         //
     }

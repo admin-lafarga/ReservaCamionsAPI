@@ -51,6 +51,10 @@ Route::middleware(['auth:sanctum','web'])->group(function () {
 
     // API CRUD RESOURCES
     Route::post('controlCamion', [ControlMaterialMuelleController::class, 'materialCamioMuelle']);
+    Route::get('getFile/{path}', [ReservaController::class, 'getPrivateFile'])->where('path', '.*');
+    Route::get('file/name/{path}', [ReservaController::class, 'getPrivateFileName'])->where('path', '.*');
+    Route::delete('file/name/{id}', [ReservaController::class, 'deletePrivateFile']);
+    Route::get('/materials/restrictions', [MaterialController::class, 'getMaterials']);
     Route::apiResource('users', UserController::class);
     Route::apiResource('proveedores', ProveedorController::class);
     Route::apiResource('transportistas', TransporteController::class);
@@ -63,16 +67,17 @@ Route::middleware(['auth:sanctum','web'])->group(function () {
     Route::apiResource('restricciones', RestriccionController::class);
     Route::apiResource('status', StatusController::class);
     Route::apiResource('bloqueo/camion/material', BloqueoCamionMaterialController::class);
-    Route::apiResource('empresa', EmpresaController::class);
+    Route::apiResource('empresas', EmpresaController::class);
     Route::apiResource('muelle/horarios', HorarioMuelleController::class);
-    Route::apiResource('muelle', MuelleController::class);
+    Route::apiResource('muelles', MuelleController::class);
     Route::apiResource('reserva', ReservaController::class);
     Route::apiResource('privilegios', PrivilegioController::class);
     Route::apiResource('bloqueo/grupos', BloqueoGrupoController::class);
     Route::apiResource('bloqueo/grupo/detalles', BloqueoGrupoDetalleController::class);
 
+
     Route::get('/columns/{table}', function ($table) {
-        $allowedTables = ['materiales', 'usuarios', 'proveedores','bloqueo/grupos'];
+        $allowedTables = ['materiales', 'usuarios', 'proveedores','bloqueo/grupos','transportes','empresas','muelles'];
         if (!in_array($table, $allowedTables)) {
             return response()->json(['error' => 'Taula no permesa'], 403);
         }

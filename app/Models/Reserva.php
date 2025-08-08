@@ -44,17 +44,17 @@ class Reserva extends Model
 
     public function tipoCamion()
     {
-        return $this->belongsTo(Tipo_Camion::class, 'tipo_camion_id');
+        return $this->belongsTo(TipoCamion::class, 'tipo_camion_id');
     }
 
-    public function tipoMaterial1()
+    public function material()
     {
-        return $this->belongsTo(Tipo_Material::class, 'tipo_material1_id');
+        return $this->belongsTo(Material::class, 'tipo_material1_id');
     }
 
-    public function tipoMaterial2()
+    public function material1()
     {
-        return $this->belongsTo(Tipo_Material::class, 'tipo_material2_id');
+        return $this->belongsTo(Material::class, 'tipo_material2_id');
     }
 
     public function proveedor()

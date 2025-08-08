@@ -15,7 +15,7 @@ class BloqueoGrupoController extends Controller
     public function index()
     {
         $bloqueoGrupos = BloqueoGrupo::with([
-            'proveedor:tipo_proveedor_id,nombre',
+            'tipoproveedor:tipo_proveedor_id,nombre',
             'detalles.material:material_id,nombre_material'
         ])->where('activo','!=', 0)->get();
 

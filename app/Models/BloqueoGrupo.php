@@ -27,9 +27,9 @@ class BloqueoGrupo extends Model
         'activo'
     ];
 
-    public function proveedor()
+    public function tipoproveedor()
     {
-        return $this->belongsTo(Proveedor::class, 'tipo_proveedor_id', 'tipo_proveedor_id');
+        return $this->belongsTo(TipoProveedor::class, 'tipo_proveedor_id', 'tipo_proveedor_id');
     }
 
     public function usuario()

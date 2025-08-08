@@ -23,8 +23,8 @@ class StoreReservaRequest extends FormRequest
     {
         return [
             'tipo_camion_id'      => ['required', 'integer', 'exists:tipo_camiones,tipo_camion_id'],
-            'tipo_material1_id'   => ['required', 'integer', 'exists:tipo_materiales,tipo_material_id'],
-            'tipo_material2_id'   => ['nullable', 'integer', 'exists:tipo_materiales,tipo_material_id', 'different:tipo_material1_id'],
+            'tipo_material1_id'   => ['required', 'integer', 'exists:materiales,material_id'],
+            'tipo_material2_id'   => ['nullable', 'integer', 'exists:materiales,material_id', 'different:tipo_material1_id'],
             'proveedor_id'        => ['required', 'integer', 'exists:proveedores,proveedor_id'],
             'transporte_id'       => ['required', 'integer', 'exists:transportes,transporte_id'],
             'muelle1_id'          => ['required', 'integer', 'exists:muelles,muelle_id'],

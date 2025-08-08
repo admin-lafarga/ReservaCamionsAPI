@@ -38,7 +38,7 @@ class EmpresaController extends Controller
      */
     public function show(Empresa $empresa)
     {
-        //
+        return response()->json($empresa);
     }
 
     /**

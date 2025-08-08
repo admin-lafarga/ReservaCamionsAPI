@@ -20,7 +20,7 @@ class ProveedorSeeder extends Seeder {
                 'tel1' => '612345678',
                 'tel2' => '',
                 'alerta' => false,
-                'estado' => 1,
+                'estado' => true,
                 'tipo_proveedor_id' => 1,
             ]
         ]);

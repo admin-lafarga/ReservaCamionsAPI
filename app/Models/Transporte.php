@@ -32,11 +32,6 @@ class Transporte extends Model
         'puede_gestionar'
     ];
 
-    protected $hidden = [
-        'NIF',
-        'PIN'
-    ];
-
     public function proveedor()
     {
         return $this->belongsTo(Proveedor::class, 'proveedor_id');
