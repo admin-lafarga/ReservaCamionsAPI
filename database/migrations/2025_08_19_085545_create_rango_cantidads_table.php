@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('materiales', function (Blueprint $table) {
-            $table->id('material_id');
-            $table->string('codigo_sap')->unique();
-            $table->string('nombre_material');
-            $table->boolean('estado')->nullable()->default(false);
-
+        Schema::create('rango_cantidades', function (Blueprint $table) {
+            $table->id('rango_cantidad_id');
+            $table->integer('min_kg')->default(0);
+            $table->integer('max_kg')->default(0);
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('materiales');
+        Schema::dropIfExists('rango_cantidades');
     }
 };

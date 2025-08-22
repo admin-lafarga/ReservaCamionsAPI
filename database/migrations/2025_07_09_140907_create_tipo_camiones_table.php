@@ -15,10 +15,9 @@ return new class extends Migration
             $table->id('tipo_camion_id');
             $table->string('nombre');
             $table->string('descripcion');
-            $table->string('materiales');
-            $table->float('timpo_descarga_a');
-            $table->float('timpo_descarga_b');
-            $table->string('muelles_permitidos');
+            $table->string('materiales')->nullable();
+            $table->float('tiempo_descarga_a');
+            $table->string('muelles_permitidos')->nullable();
             $table->boolean('estado')->nullable()->default(false);
             $table->boolean('bloqueo_muelles')->nullable()->default(false);
 

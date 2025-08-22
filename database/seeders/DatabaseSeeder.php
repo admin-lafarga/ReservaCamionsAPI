@@ -33,7 +33,8 @@ class DatabaseSeeder extends Seeder
             PrivilegioSeeder::class,
             ReservaSeeder::class,
             ControlMaterialMuelleSeeder::class,
-            BloqueoGrupoDetalleSeeder::class
+            BloqueoGrupoDetalleSeeder::class,
+            RangoCantidadSeeder::class
         ]);
     }
 }

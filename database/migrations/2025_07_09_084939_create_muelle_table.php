@@ -21,8 +21,7 @@ return new class extends Migration
             $table->boolean('abierto_festivos')->nullable()->default(false);
             $table->string('color');
             $table->boolean('estado')->nullable()->default(false);
-            $table->integer('cantidad_acceptada');
-
+            
             $table->timestamps();
         });
     }

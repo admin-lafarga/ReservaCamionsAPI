@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreStatusRequest extends FormRequest
+class UpdateRangoCantidadRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,8 @@ class StoreStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre' => 'required|string|max:255|unique:status,nombre',
-            'descripcion' => 'nullable|string|max:500',
-            'estado' => 'required|boolean',
+            'min_kg' => 'required|numeric|min:0',
+            'max_kg' => 'required|numeric|gte:min_kg',
         ];
     }
 }

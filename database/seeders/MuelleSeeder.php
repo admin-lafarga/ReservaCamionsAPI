@@ -19,7 +19,6 @@ class MuelleSeeder extends Seeder
                 'abierto_festivos' => true,
                 'color' => '#ff0000',
                 'estado' => 1,
-                'cantidad_acceptada' => 5,
             ],
             [
                 'empresa_id' => 2,
@@ -30,7 +29,6 @@ class MuelleSeeder extends Seeder
                 'abierto_festivos' => false,
                 'color' => '#00ff00',
                 'estado' => 1,
-                'cantidad_acceptada' => 3,
             ],
         ]);
     }

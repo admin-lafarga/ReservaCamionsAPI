@@ -25,6 +25,7 @@ use App\Http\Controllers\PrivilegioController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BloqueoGrupoController;
 use App\Http\Controllers\BloqueoGrupoDetalleController;
+use App\Http\Controllers\RangoCantidadController;
 
 Route::get('/', function (Request $request) {
     return response()->json([
@@ -51,10 +52,18 @@ Route::middleware(['auth:sanctum','web'])->group(function () {
 
     // API CRUD RESOURCES
     Route::post('controlCamion', [ControlMaterialMuelleController::class, 'materialCamioMuelle']);
+
+
     Route::get('getFile/{path}', [ReservaController::class, 'getPrivateFile'])->where('path', '.*');
     Route::get('file/name/{path}', [ReservaController::class, 'getPrivateFileName'])->where('path', '.*');
     Route::delete('file/name/{id}', [ReservaController::class, 'deletePrivateFile']);
+    Route::get('/reservas/calendar', [ReservaController::class, 'indexCalendar']);
+    Route::get('/reservas/bloqueos', [ReservaController::class, 'indexBloqueoMuelle']);
+    Route::post('/reservas/bloqueos', [ReservaController::class, 'storeBloqueoMuelle']);
+    Route::put('/reservas/bloqueos/{id}', [ReservaController::class, 'updateBloqueoMuelle']);
+
     Route::get('/materials/restrictions', [MaterialController::class, 'getMaterials']);
+
     Route::apiResource('users', UserController::class);
     Route::apiResource('proveedores', ProveedorController::class);
     Route::apiResource('transportistas', TransporteController::class);
@@ -74,10 +83,11 @@ Route::middleware(['auth:sanctum','web'])->group(function () {
     Route::apiResource('privilegios', PrivilegioController::class);
     Route::apiResource('bloqueo/grupos', BloqueoGrupoController::class);
     Route::apiResource('bloqueo/grupo/detalles', BloqueoGrupoDetalleController::class);
+    Route::apiResource('rango/cantidad', RangoCantidadController::class);
 
 
     Route::get('/columns/{table}', function ($table) {
-        $allowedTables = ['materiales', 'usuarios', 'proveedores','bloqueo/grupos','transportes','empresas','muelles','users'];
+        $allowedTables = ['materiales', 'usuarios', 'proveedores','bloqueo/grupos','transportes','empresas','muelles','users','tipo_camiones','status','reservas'];
         if (!in_array($table, $allowedTables)) {
             return response()->json(['error' => 'Taula no permesa'], 403);
         }

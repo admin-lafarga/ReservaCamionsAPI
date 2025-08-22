@@ -21,10 +21,7 @@ class TipoCamion extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
-        'materiales',
-        'timpo_descarga_a',
-        'timpo_descarga_b',
-        'muelles_permitidos',
+        'tiempo_descarga_a',
         'estado',
         'bloqueo_muelles'
     ];

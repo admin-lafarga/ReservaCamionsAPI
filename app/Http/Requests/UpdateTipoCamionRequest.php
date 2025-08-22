@@ -11,7 +11,7 @@ class UpdateTipoCamionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,14 @@ class UpdateTipoCamionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nombre'            => ['sometimes', 'required', 'string', 'max:255'],
+            'descripcion'       => ['nullable', 'string', 'max:500'],
+            'materiales'        => ['nullable', 'string'],
+            'tiempo_descarga_a'  => ['sometimes', 'required', 'integer', 'min:0'],
+            'tiempo_descarga_b'  => ['sometimes', 'required', 'integer', 'min:0'],
+            'muelles_permitidos'=> ['nullable', 'string'],
+            'estado'            => ['sometimes', 'required', 'boolean'],
+            'bloqueo_muelles'   => ['sometimes', 'required', 'boolean'],
         ];
     }
 }

@@ -10,13 +10,15 @@ use App\Models\DocumentosReserva;
 use Illuminate\Support\Facades\Log;
 use App\Models\Proveedor;
 use App\Models\BloqueoGrupo;
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ReservaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    // Llistat de reservas CRUD
     public function index()
     {
         $reservas = Reserva::with([
@@ -26,7 +28,25 @@ class ReservaController extends Controller
             'material:material_id,nombre_material',
             'material1:material_id,nombre_material',
             'muelle1'
-        ])->get();
+        ])
+        ->whereNotNull('cantidad1')
+        ->get();
+
+        return response()->json($reservas);
+    }
+
+    // Llistat de reserves Calendari
+    public function indexCalendar()
+    {
+        $reservas = Reserva::with([
+            'documentos',
+            'proveedor:proveedor_id,nombre',
+            'tipoCamion:tipo_camion_id,nombre',
+            'material:material_id,nombre_material',
+            'material1:material_id,nombre_material',
+            'muelle1'
+        ])
+        ->get();
 
         return response()->json($reservas);
     }
@@ -416,6 +436,8 @@ class ReservaController extends Controller
         ]);
     }
 
+    // GESTIÓ DE DOCUMENTS DE LES RESERVES #######################################################################
+
     // Retornar els fitxers associats a la reserva
     public function getPrivateFile($path)
     {
@@ -478,4 +500,124 @@ class ReservaController extends Controller
 
         return response()->json(['missatge' => 'Fitxer eliminat correctament']);
     }
+
+    ########################################################################################
+
+    // BLOQUEIG DE MOLLS (s'ha seguit la mateixa llògica que es fa a Wifor, per això està ubicat dins de reserves)
+
+    public function indexBloqueoMuelle() {
+
+        $reservas = Reserva::with(['muelle1'])->whereNull('cantidad1')->get();
+
+        return response()->json($reservas);
+    }
+
+    /**
+     * Crear un nuevo bloqueo de muelle.
+     */
+    public function storeBloqueoMuelle(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'muelle1_id' => 'required|exists:muelles,muelle_id',
+            'inicio1'    => 'required|date',
+            'fin1'       => 'required|date|after_or_equal:inicio1',
+            'notas'      => 'nullable|string|max:500',
+        ], [
+            'muelle1_id.required' => 'El muelle és obligatori.',
+            'muelle1_id.exists'   => 'El muelle seleccionat no existeix.',
+            'inicio1.required'    => 'La data d’inici és obligatòria.',
+            'fin1.required'       => 'La data de fi és obligatòria.',
+            'fin1.after_or_equal' => 'La data de fi ha de ser posterior o igual a la d’inici.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $data = $validator->validated();
+
+        // Buscar conflictes d’horaris al mateix muelle
+        $conflicto = Reserva::where('muelle1_id', $data['muelle1_id'])
+            ->where(function ($q) use ($data) {
+                $q->whereBetween('inicio1', [$data['inicio1'], $data['fin1']]) // inicia dins del nou bloqueig
+                ->orWhereBetween('fin1', [$data['inicio1'], $data['fin1']]) // acaba dins del nou bloqueig
+                ->orWhere(function ($q2) use ($data) { // ocupa tot el rang
+                    $q2->where('inicio1', '<=', $data['inicio1'])
+                        ->where('fin1', '>=', $data['fin1']);
+                });
+            })
+            ->exists();
+
+        if ($conflicto) {
+            return response()->json([
+                'id' => '1',
+                'message' => 'Ya existe una reserva o bloqueo en ese rango horario para el muelle seleccionado.',
+            ], 422);
+        }
+
+        $bloqueo = Reserva::create($data);
+
+        return response()->json([
+            'message' => 'Bloqueo creado correctamente',
+            'data'    => $bloqueo
+        ], 201);
+    }
+
+
+    /**
+     * Actualizar un bloqueo de muelle existente.
+     */
+    public function updateBloqueoMuelle(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'muelle1_id' => 'required|exists:muelles,muelle_id',
+            'inicio1'    => 'required|date',
+            'fin1'       => 'required|date|after_or_equal:inicio1',
+            'notas'      => 'nullable|string|max:500',
+        ], [
+            'muelle1_id.required' => 'El muelle és obligatori.',
+            'muelle1_id.exists'   => 'El muelle seleccionat no existeix.',
+            'inicio1.required'    => 'La data d’inici és obligatòria.',
+            'fin1.required'       => 'La data de fi és obligatòria.',
+            'fin1.after_or_equal' => 'La data de fi ha de ser posterior o igual a la d’inici.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $data = $validator->validated();
+
+        $conflicto = Reserva::where('muelle1_id', $data['muelle1_id'])
+            ->where('reserva_id', '!=', $id) // exclou la reserva que s’està actualitzant
+            ->where(function ($q) use ($data) {
+                $q->whereBetween('inicio1', [$data['inicio1'], $data['fin1']])
+                ->orWhereBetween('fin1', [$data['inicio1'], $data['fin1']])
+                ->orWhere(function ($q2) use ($data) {
+                    $q2->where('inicio1', '<=', $data['inicio1'])
+                        ->where('fin1', '>=', $data['fin1']);
+                });
+            })
+            ->exists();
+
+       if ($conflicto) {
+            return response()->json([
+                'id' => '1',
+                'message' => 'Ya existe una reserva o bloqueo en ese rango horario para el muelle seleccionado.',
+            ], 422);
+        }
+
+        $bloqueo = Reserva::findOrFail($id);
+        $bloqueo->update($data);
+
+        return response()->json([
+            'message' => 'Bloqueig actualitzat correctament',
+            'data'    => $bloqueo
+        ], 200);
+    }
+
 }

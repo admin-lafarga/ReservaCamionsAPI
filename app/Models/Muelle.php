@@ -27,7 +27,6 @@ class Muelle extends Model
         'abierto_festivos',
         'color',
         'estado',
-        'cantidad_acceptada',
     ];
 
     public function empresa()
