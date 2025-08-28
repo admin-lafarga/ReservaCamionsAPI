@@ -27,6 +27,7 @@ class TipoCamionController extends Controller
 
         return response()->json([
             'message' => 'TipoCamion creado correctamente',
+            'camion' => $tipoCamion
         ], 201);
     }
 

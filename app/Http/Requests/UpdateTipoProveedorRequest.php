@@ -22,7 +22,7 @@ class UpdateTipoProveedorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nombre' => ['required', 'max:255']
         ];
     }
 }
