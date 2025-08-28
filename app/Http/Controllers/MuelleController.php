@@ -13,7 +13,11 @@ class MuelleController extends Controller
      */
     public function index()
     {
-        $muelles = Muelle::with('empresa:empresa_id,nombre')->get();
+        $muelles = Muelle::with([
+            'empresa:empresa_id,nombre',
+            'horarios:horarios_muelle_id,muelle_id,num_dia,inicio,fin'
+        ])->get();
+
         return response()->json($muelles);
     }
 

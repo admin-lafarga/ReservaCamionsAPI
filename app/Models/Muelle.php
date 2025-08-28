@@ -36,7 +36,7 @@ class Muelle extends Model
 
     public function horarios()
     {
-        return $this->hasMany(Horario_Muelle::class, 'muelle_id');
+        return $this->hasMany(HorarioMuelle::class, 'muelle_id');
     }
 
     public function reservas1()

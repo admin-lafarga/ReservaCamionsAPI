@@ -27,11 +27,11 @@ class StoreHorarioMuelleRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $exists = HorarioMuelle::where('muelle_id', $this->muelle_id)
-                ->where('dia', $this->dia)
+                ->where('num_dia', $this->num_dia)
                 ->exists();
 
             if ($exists) {
-                $validator->errors()->add('dia', 'Ya existe un horario para este muelle en este día.');
+                $validator->errors()->add('message', 'Ya existe un horario para este muelle en este día.');
             }
         });
     }

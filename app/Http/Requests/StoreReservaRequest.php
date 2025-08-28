@@ -3,22 +3,15 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Reserva;
 
 class StoreReservaRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -43,8 +36,34 @@ class StoreReservaRequest extends FormRequest
             'tel1'                => ['nullable', 'string', 'max:50'],
             'duracion1'           => ['required', 'numeric', 'min:0'],
             'duracion2'           => ['nullable', 'numeric', 'min:0'],
-            'archivos' => ['nullable', 'array'],
-            'archivos.*' => ['file', 'max:5120'],
+            'archivos'            => ['nullable', 'array'],
+            'archivos.*'          => ['file', 'max:5120'],
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $muelleIds = [$this->muelle1_id];
+            if ($this->muelle2_id) {
+                $muelleIds[] = $this->muelle2_id;
+            }
+
+            // Solapament dels horaris CONTROL
+            foreach ($muelleIds as $muelleId) {
+                $overlap = Reserva::where('muelle1_id', $muelleId)
+                    ->orWhere('muelle2_id', $muelleId)
+                    ->where(function ($query) {
+                        $query->where(function ($q) {
+                            $q->where('inicio1', '<', $this->fin1)
+                              ->where('fin1', '>', $this->inicio1);
+                        })
+                    })->exists();
+
+                if ($overlap) {
+                    $validator->errors()->add('muelle1_id', "Ya existe una reserva solapada en el muelle {$muelleId}.");
+                }
+            }
+        });
     }
 }

@@ -40,7 +40,7 @@ class HorarioMuelleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(HorarioMuelle $moll_Horari)
+    public function show(HorarioMuelle $horario)
     {
         //
     }
@@ -48,9 +48,9 @@ class HorarioMuelleController extends Controller
     /**
      * Update the specified resource.
      */
-    public function update(UpdateHorarioMuelleRequest $request, HorarioMuelle $horariosMuelle)
+    public function update(UpdateHorarioMuelleRequest $request, HorarioMuelle $horario)
     {
-        $horariosMuelle->update($request->validated());
+        $horario->update($request->validated());
 
         return response()->json([
             'message' => 'Horario actualizado correctamente',
@@ -60,9 +60,9 @@ class HorarioMuelleController extends Controller
     /**
      * Remove the specified resource.
      */
-    public function destroy(HorarioMuelle $horariosMuelle)
+    public function destroy(HorarioMuelle $horario)
     {
-        $horariosMuelle->delete();
+        $horario->delete();
 
         return response()->json([
             'message' => 'Horario eliminado correctamente'
