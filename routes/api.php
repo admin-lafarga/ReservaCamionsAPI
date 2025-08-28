@@ -87,7 +87,7 @@ Route::middleware(['auth:sanctum','web'])->group(function () {
 
 
     Route::get('/columns/{table}', function ($table) {
-        $allowedTables = ['materiales', 'usuarios', 'proveedores','bloqueo/grupos','transportes','empresas','muelles','users','tipo_camiones','status','reservas'];
+        $allowedTables = ['materiales', 'usuarios', 'proveedores','bloqueo/grupos','transportes','empresas','muelles','users','tipo_camiones','status','reservas','horarios_muelles'];
         if (!in_array($table, $allowedTables)) {
             return response()->json(['error' => 'Taula no permesa'], 403);
         }

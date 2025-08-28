@@ -12,7 +12,7 @@ class TipoCamionSeeder extends Seeder {
             [
                 'nombre' => 'Camió Petit',
                 'descripcion' => 'Camió amb poca capacitat',
-                'materiales' => '1,2', // IDs o codis dels materials
+                'materiales' => '1,2', // IDs o codis dels materials CAMP NO ÚTIL
                 'tiempo_descarga_a' => 15,
                 'muelles_permitidos' => '1;2',
                 'estado' => 1,

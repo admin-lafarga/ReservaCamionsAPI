@@ -9,7 +9,7 @@ use App\Models\Restriccion;
 class RestriccionSeeder extends Seeder {
     public function run(): void {
         Restriccion::insert([
-            ['muelle1_id' => 1, 'muelle2_id' => 1],
+            ['muelle_id' => 1, 'muelle_restringido_id' => 1],
         ]);
     }
 }

@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('restricciones', function (Blueprint $table) {
             $table->id('restriccion_id');
-            $table->unsignedBigInteger('muelle1_id');
-            $table->unsignedBigInteger('muelle2_id');
+            $table->unsignedBigInteger('muelle_id');
+            $table->unsignedBigInteger('muelle_restringido_id');
             $table->timestamps();
 
-            $table->foreign('muelle1_id')->references('muelle_id')->on('muelles')->onDelete('cascade');
-            $table->foreign('muelle2_id')->references('muelle_id')->on('muelles')->onDelete('cascade');
+            $table->foreign('muelle_id')->references('muelle_id')->on('muelles')->onDelete('cascade');
+            $table->foreign('muelle_restringido_id')->references('muelle_id')->on('muelles')->onDelete('cascade');
         });
     }
 

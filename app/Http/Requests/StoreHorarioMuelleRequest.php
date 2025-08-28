@@ -3,26 +3,36 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\HorarioMuelle;
 
 class StoreHorarioMuelleRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            //
+            'muelle_id' => 'required|exists:muelles,muelle_id',
+            'dia'       => 'required|string|max:50',
+            'num_dia'   => 'required|string|max:2',
+            'inicio'    => 'required|date_format:H:i',
+            'fin'       => 'required|date_format:H:i|after:inicio',
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $exists = HorarioMuelle::where('muelle_id', $this->muelle_id)
+                ->where('dia', $this->dia)
+                ->exists();
+
+            if ($exists) {
+                $validator->errors()->add('dia', 'Ya existe un horario para este muelle en este día.');
+            }
+        });
     }
 }

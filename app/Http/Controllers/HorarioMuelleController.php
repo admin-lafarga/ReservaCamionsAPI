@@ -13,7 +13,7 @@ class HorarioMuelleController extends Controller
      */
     public function index()
     {
-        $horariosMuelle = HorarioMuelle::all();
+        $horariosMuelle = HorarioMuelle::with('muelle')->get();
         return response()->json($horariosMuelle);
     }
 
@@ -30,7 +30,11 @@ class HorarioMuelleController extends Controller
      */
     public function store(StoreHorarioMuelleRequest $request)
     {
-        //
+        $horario = HorarioMuelle::create($request->validated());
+
+        return response()->json([
+            'message' => 'Horario creado correctamente',
+        ], 201);
     }
 
     /**
@@ -42,26 +46,26 @@ class HorarioMuelleController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Update the specified resource.
      */
-    public function edit(HorarioMuelle $moll_Horari)
+    public function update(UpdateHorarioMuelleRequest $request, HorarioMuelle $horariosMuelle)
     {
-        //
+        $horariosMuelle->update($request->validated());
+
+        return response()->json([
+            'message' => 'Horario actualizado correctamente',
+        ], 200);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Remove the specified resource.
      */
-    public function update(UpdateHorarioMuelleRequest $request, Horarios_Muelle $moll_Horari)
+    public function destroy(HorarioMuelle $horariosMuelle)
     {
-        //
-    }
+        $horariosMuelle->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(HorarioMuelle $moll_Horari)
-    {
-        //
+        return response()->json([
+            'message' => 'Horario eliminado correctamente'
+        ], 200);
     }
 }
