@@ -4,6 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Reserva;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Models\HorarioMuelle;
+use Carbon\Carbon;
 
 class StoreReservaRequest extends FormRequest
 {
@@ -41,6 +44,7 @@ class StoreReservaRequest extends FormRequest
         ];
     }
 
+    // AQUÍ S'HAURÀ D'APLICAR LA LÒGICA DEL TEMA DE LA TAULA RESTRICCIONES
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
@@ -49,21 +53,53 @@ class StoreReservaRequest extends FormRequest
                 $muelleIds[] = $this->muelle2_id;
             }
 
-            // Solapament dels horaris CONTROL
+            // Comprovem solapament amb altres reserves
             foreach ($muelleIds as $muelleId) {
-                $overlap = Reserva::where('muelle1_id', $muelleId)
-                    ->orWhere('muelle2_id', $muelleId)
+                $overlap = Reserva::where(function ($q) use ($muelleId) {
+                        $q->where('muelle1_id', $muelleId);
+                    })
                     ->where(function ($query) {
-                        $query->where(function ($q) {
-                            $q->where('inicio1', '<', $this->fin1)
-                              ->where('fin1', '>', $this->inicio1);
-                        })
-                    })->exists();
+                        $query->where('inicio1', '<', $this->fin1)
+                            ->where('fin1', '>', $this->inicio1);
+                    })
+                    ->exists();
 
                 if ($overlap) {
-                    $validator->errors()->add('muelle1_id', "Ya existe una reserva solapada en el muelle {$muelleId}.");
+                    throw new HttpResponseException(response()->json([
+                        'id'      => 2,
+                        'message' => "Ya existe una reserva solapada en el muelle {$muelleId}.",
+                    ], 422));
+                }
+            }
+
+            // Validació contra horarios del muelle
+            foreach ($muelleIds as $muelleId) {
+                // Agafem el dia de la setmana
+                $dayOfWeek = Carbon::parse($this->inicio1)->dayOfWeekIso;
+
+                $horario = HorarioMuelle::where('muelle_id', $muelleId)
+                    ->where('num_dia', $dayOfWeek)
+                    ->first();
+
+                if (!$horario) {
+                    throw new HttpResponseException(response()->json([
+                        'id'      => 3,
+                        'message' => "El muelle {$muelleId} no té horari configurat per aquest dia.",
+                    ], 422));
+                }
+
+                // Passem hores a format HH:MM
+                $reservaInicio = Carbon::parse($this->inicio1)->format('H:i:s');
+                $reservaFin    = Carbon::parse($this->fin1)->format('H:i:s');
+
+                if ($reservaInicio < $horario->inicio || $reservaFin > $horario->fin) {
+                    throw new HttpResponseException(response()->json([
+                        'id'      => 4,
+                        'message' => "La reserva en el muelle {$muelleId} ha d'estar dins de l'horari permès ({$horario->inicio} - {$horario->fin}).",
+                    ], 422));
                 }
             }
         });
     }
+
 }
