@@ -14,12 +14,27 @@ class MaterialController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $materials = Material::with([
+        $ids = [];
+
+        if ($request->has('id1')) {
+            $ids[] = $request->query('id1');
+        }
+        if ($request->has('id2')) {
+            $ids[] = $request->query('id2');
+        }
+
+        $query = Material::with([
             'controlMaterialMuelle.tipoCamion:tipo_camion_id,nombre',
             'controlMaterialMuelle.muelle:muelle_id,nombre_muelle'
-        ])->get();
+        ]);
+
+        if (!empty($ids)) {
+            $materials = $query->whereIn('material_id', $ids)->get();
+        } else {
+            $materials = $query->get();
+        }
 
         return response()->json($materials);
     }
@@ -179,23 +194,23 @@ class MaterialController extends Controller
     }
 
     // Controlador
-    public function getMaterials(Request $request)
-    {
-        $ids = [];
+    // public function getMaterials(Request $request)
+    // {
+    //     $ids = [];
 
-        if ($request->has('id1')) {
-            $ids[] = $request->query('id1');
-        }
-        if ($request->has('id2')) {
-            $ids[] = $request->query('id2');
-        }
+    //     if ($request->has('id1')) {
+    //         $ids[] = $request->query('id1');
+    //     }
+    //     if ($request->has('id2')) {
+    //         $ids[] = $request->query('id2');
+    //     }
 
-        if (empty($ids)) {
-            return response()->json(['error' => 'No s’han passat IDs'], 400);
-        }
+    //     if (empty($ids)) {
+    //         return response()->json(['error' => 'No s’han passat IDs'], 400);
+    //     }
 
-        $materials = Material::whereIn('material_id', $ids)->get();
+    //     $materials = Material::whereIn('material_id', $ids)->get();
 
-        return response()->json($materials);
-    }
+    //     return response()->json($materials);
+    // }
 }

@@ -18,33 +18,21 @@ class RestriccionController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreRestriccionRequest $request)
     {
-        //
+        Restriccion::create($request->validated());
+
+        return response()->json([
+            'message' => 'Restriccion añadida correctamente'
+        ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Restriccion $restriccio)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Restriccion $restriccio)
+    public function show(Restriccion $restriccion)
     {
         //
     }
@@ -52,16 +40,25 @@ class RestriccionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRestriccionRequest $request, Restriccion $restriccio)
+    public function update(UpdateRestriccionRequest $request, Restriccion $restriccion)
     {
-        //
+        $restriccio->update($request->validated());
+        
+        return response()->json([
+            'message' => 'Restriccion actualizada correctamente',
+            'data' => $restriccio,
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Restriccion $restriccio)
+    public function destroy(Restriccion $restriccion)
     {
-        //
+        $restriccion->delete();
+
+        return response()->json([
+            'message' => 'Restriccion eliminada correctamente'
+        ]);
     }
 }

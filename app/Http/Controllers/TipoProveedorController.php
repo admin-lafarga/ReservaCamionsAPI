@@ -13,55 +13,55 @@ class TipoProveedorController extends Controller
      */
     public function index()
     {
-        $tiposProveidor = TipoProveedor::all();
-        return response()->json($tiposProveidor);
+        $tipoProveedor = TipoProveedor::all();
+        return response()->json($tipoProveedor);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreTipoProveedorRequest $request)
     {
-        //
+        TipoProveedor::create($request->validated());
+
+        return response()->json([
+            'message' => 'Tipo proveedor añadido correctamente'
+        ]);
+        
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(TipoProveedor $tipusProveidor)
+    public function show(TipoProveedor $tipoProveedor)
     {
-        //
+        
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(TipoProveedor $tipusProveidor)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTipoProveedorRequest $request, TipoProveedor $tipusProveidor)
+    public function update(UpdateTipoProveedorRequest $request, TipoProveedor $tipoProveedor)
     {
-        //
+        $tipoProveedor->update($request->validated());
+        
+        return response()->json([
+            'message' => 'Tipo proveedor actualizado correctamente',
+            'data' => $tipoProveedor,
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(TipoProveedor $tipusProveidor)
+    public function destroy(TipoProveedor $tipoProveedor)
     {
-        //
+        $tipoProveedor->delete();
+
+        return response()->json([
+            'message' => 'Tipo proveedor eliminado correctamente'
+        ]);
     }
 }

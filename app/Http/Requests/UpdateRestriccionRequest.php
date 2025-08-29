@@ -22,7 +22,8 @@ class UpdateRestriccionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'muelle_id' => ['required','exists:muelles'],
+            'muelle_restringido_id' => ['required','exists:muelles'],
         ];
     }
 }

@@ -67,13 +67,13 @@ Route::middleware(['auth:sanctum','web'])->group(function () {
     Route::apiResource('users', UserController::class);
     Route::apiResource('proveedores', ProveedorController::class);
     Route::apiResource('transportistas', TransporteController::class);
-    Route::apiResource('tipoproveedores', TipoProveedorController::class);
+    Route::apiResource('tipoproveedores', TipoProveedorController::class)->parameters(['tipoproveedores' => 'tipoProveedor']);
     Route::apiResource('tipocamiones', TipoCamionController::class);
     Route::apiResource('tipomuelles', TipoMuelleController::class);
     Route::apiResource('tipomateriales', TipoMaterialController::class);
     Route::apiResource('materiales', MaterialController::class);
     Route::apiResource('roles', RolController::class);
-    Route::apiResource('restricciones', RestriccionController::class);
+    Route::apiResource('restricciones', RestriccionController::class)->parameters(['restricciones' => 'restriccion']);
     Route::apiResource('status', StatusController::class);
     Route::apiResource('bloqueo/camion/material', BloqueoCamionMaterialController::class);
     Route::apiResource('empresas', EmpresaController::class);

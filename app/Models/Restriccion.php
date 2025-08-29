@@ -19,18 +19,18 @@ class Restriccion extends Model
     }
 
     protected $fillable = [
-        'muelle1_id',
-        'muelle2_id'
+        'muelle_id',
+        'muelle_restringido_id'
     ];
 
     public function muelle1()
     {
-        return $this->belongsTo(Muelle::class, 'muelle1_id');
+        return $this->belongsTo(Muellse::class, 'muelle_id');
     }
 
     public function muelle2()
     {
-        return $this->belongsTo(Muelle::class, 'muelle2_id');
+        return $this->belongsTo(Muelle::class, 'muelle_restringido_id');
     }
 
 }
