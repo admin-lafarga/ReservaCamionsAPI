@@ -63,10 +63,6 @@ class MaterialController extends Controller
                 'codigo_sap' => $data['codigo_sap'],
                 'nombre_material' => $data['nombre'],
                 'estado' => $data['estado'],
-                // Aquests camps els deixo hardcoded, ja que en un futur han de marxar (acabar de validar amb Hassan)
-                'camiones_permitidos' => 'tots',
-                'muelles_permitidos' => 'tots',
-                'max_concurrencia' => 'infinit',
             ]);
 
             // Crear control_material_muelle combinando cada truck con cada muelle

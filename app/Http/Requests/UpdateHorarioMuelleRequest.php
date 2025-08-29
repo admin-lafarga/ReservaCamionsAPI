@@ -26,9 +26,9 @@ class UpdateHorarioMuelleRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $horario = $this->route('horario'); // nombre correcto del parámetro
+            $horario = $this->route('horario');
 
-            if (!$horario) return; // si no hay binding, no hacer nada
+            if (!$horario) return;
 
             $muelle_id = $this->muelle_id ?? $horario->muelle_id;
             $num_dia   = $this->num_dia ?? $horario->num_dia;
@@ -39,7 +39,6 @@ class UpdateHorarioMuelleRequest extends FormRequest
                 ->exists();
 
             if ($exists) {
-                // asignamos error a 'num_dia' o 'muelle_id' que realmente se envía
                 $validator->errors()->add('message', 'Ya existe un horario para este muelle en este día.');
             }
         });

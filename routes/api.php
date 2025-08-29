@@ -62,8 +62,6 @@ Route::middleware(['auth:sanctum','web'])->group(function () {
     Route::post('/reservas/bloqueos', [ReservaController::class, 'storeBloqueoMuelle']);
     Route::put('/reservas/bloqueos/{id}', [ReservaController::class, 'updateBloqueoMuelle']);
 
-    Route::get('/materials/restrictions', [MaterialController::class, 'getMaterials']);
-
     Route::apiResource('users', UserController::class);
     Route::apiResource('proveedores', ProveedorController::class);
     Route::apiResource('transportistas', TransporteController::class);
