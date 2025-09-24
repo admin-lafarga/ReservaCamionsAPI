@@ -22,11 +22,14 @@ class RestriccionController extends Controller
      */
     public function store(StoreRestriccionRequest $request)
     {
-        Restriccion::create($request->validated());
+        foreach ($request->all() as $item) {
+            Restriccion::firstOrCreate([
+                'muelle_id' => $item['muelle_id'],
+                'muelle_restringido_id' => $item['muelle_restringido_id'],
+            ]);
+        }
 
-        return response()->json([
-            'message' => 'Restriccion añadida correctamente'
-        ]);
+        return response()->json(['message' => 'Restricciones añadidas'], 201);
     }
 
     /**
@@ -42,11 +45,11 @@ class RestriccionController extends Controller
      */
     public function update(UpdateRestriccionRequest $request, Restriccion $restriccion)
     {
-        $restriccio->update($request->validated());
+        $restriccion->update($request->validated());
         
         return response()->json([
             'message' => 'Restriccion actualizada correctamente',
-            'data' => $restriccio,
+            'data' => $restriccion,
         ]);
     }
 
@@ -60,5 +63,16 @@ class RestriccionController extends Controller
         return response()->json([
             'message' => 'Restriccion eliminada correctamente'
         ]);
+    }
+
+    public function bulkDelete(StoreRestriccionRequest $request)
+    {
+        foreach ($request->all() as $item) {
+            Restriccion::where('muelle_id', $item['muelle_id'])
+                ->where('muelle_restringido_id', $item['muelle_restringido_id'])
+                ->delete();
+        }
+
+        return response()->json(['message' => 'Restricciones eliminadas'], 200);
     }
 }

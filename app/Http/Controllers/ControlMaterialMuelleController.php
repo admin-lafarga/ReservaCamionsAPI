@@ -51,7 +51,7 @@ class ControlMaterialMuelleController extends Controller
         //
     }
 
-    // Retorna retorna la info dels camions, juntament amb els molls que hi ha disponible per aquests dos
+    // Retorna la info dels camions, juntament amb els molls que hi ha disponible per aquests dos
     public function materialCamioMuelle(Request $request)
     {
         $request->validate([

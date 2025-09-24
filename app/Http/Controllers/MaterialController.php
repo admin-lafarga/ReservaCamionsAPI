@@ -121,9 +121,9 @@ class MaterialController extends Controller
                 'codigo_sap' => $data['codigo_sap'],
                 'nombre_material' => $data['nombre'],
                 'estado' => $data['estado'],
-                'camiones_permitidos' => 'tots',
-                'muelles_permitidos' => 'tots',
-                'max_concurrencia' => 'infinit',
+                // 'camiones_permitidos' => 'tots',
+                // 'muelles_permitidos' => 'tots',
+                // 'max_concurrencia' => 'infinit',
             ]);
 
             // Obtenir combinacions actuals

@@ -25,7 +25,7 @@ class Restriccion extends Model
 
     public function muelle1()
     {
-        return $this->belongsTo(Muellse::class, 'muelle_id');
+        return $this->belongsTo(Muelle::class, 'muelle_id');
     }
 
     public function muelle2()

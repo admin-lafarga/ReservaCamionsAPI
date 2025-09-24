@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('horarios_muelle_id');
             $table->unsignedBigInteger('muelle_id');
             $table->string('dia');
-            $table->string('num_dia');
+            $table->string('dia_semana');
             $table->time('inicio');
             $table->time('fin');
 

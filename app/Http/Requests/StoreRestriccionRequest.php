@@ -11,7 +11,7 @@ class StoreRestriccionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,8 +22,8 @@ class StoreRestriccionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'muelle_id' => ['required','exists:muelles'],
-            'muelle_restringido_id' => ['required','exists:muelles'],
+            '*.muelle_id' => ['required','integer','exists:muelles,muelle_id'],
+            '*.muelle_restringido_id' => ['required','integer','exists:muelles,muelle_id'],
         ];
     }
 }

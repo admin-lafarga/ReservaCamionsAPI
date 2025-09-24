@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreReservaRequest;
 use App\Http\Requests\UpdateReservaRequest;
 use App\Models\Reserva;
 use App\Models\DocumentosReserva;
-use Illuminate\Support\Facades\Log;
 use App\Models\Proveedor;
 use App\Models\BloqueoGrupo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Mail\ConfirmationMail;
+use Illuminate\Support\Facades\Mail;
+
 
 class ReservaController extends Controller
 {
@@ -120,6 +121,56 @@ class ReservaController extends Controller
             ->get();
         }
 
+        //Validar si existen restricciones entre los muelles
+        //primero obetener las reservas a la misma hora y fecha y luego validar si entre esa reserva y la nueva hay restricciones
+        $conflicto = Reserva::where(function ($q) use ($validatedData) {
+            $q->whereBetween('inicio1', [$validatedData['inicio1'], $validatedData['fin1']]) // inicia dins del nou bloqueig
+            ->orWhereBetween('fin1', [$validatedData['inicio1'], $validatedData['fin1']]) // acaba dins del nou bloqueig
+            ->orWhere(function ($q2) use ($validatedData) { // ocupa tot el rang
+                $q2->where('inicio1', '<=', $validatedData['inicio1'])
+                    ->where('fin1', '>=', $validatedData['fin1']);
+            });
+        })
+        ->where(function ($q) use ($validatedData) {
+            $q->where('muelle1_id', $validatedData['muelle1_id'])
+              ->orWhere('muelle1_id', $validatedData['muelle2_id'] ?? 0)
+              ->orWhere('muelle2_id', $validatedData['muelle1_id'])
+              ->orWhere('muelle2_id', $validatedData['muelle2_id'] ?? 0);
+        })
+        ->get();
+
+        foreach ($conflicto as $res) {
+            if ($res->muelle1 && $res->muelle2) {
+                $muellesReserva = [$res->muelle1_id, $res->muelle2_id];
+            } else {
+                $muellesReserva = [$res->muelle1_id];
+            }
+
+            if (in_array($validatedData['muelle1_id'], $muellesReserva) || 
+                (isset($validatedData['muelle2_id']) && in_array($validatedData['muelle2_id'], $muellesReserva))) {
+                // Aquí validar si hay restricción entre los muelles
+                $restriccion = \App\Models\Restriccion::where(function ($q) use ($validatedData, $muellesReserva) {
+                    $q->where('muelle_id', $validatedData['muelle1_id'])
+                      ->whereIn('muelle_restringido_id', $muellesReserva);
+                })->orWhere(function ($q) use ($validatedData, $muellesReserva) {
+                    if (isset($validatedData['muelle2_id'])) {
+                        $q->where('muelle_id', $validatedData['muelle2_id'])
+                          ->whereIn('muelle_restringido_id', $muellesReserva);
+                    }
+                })->first();
+
+                if ($restriccion) {
+                    return response()->json([
+                        'id' => 2,
+                        'message' => 'Restricción entre muelles. No se puede crear la reserva con los muelles seleccionados.',
+                        'muelle_id' => $restriccion->muelle_id,
+                        'muelle_restringido_id' => $restriccion->muelle_restringido_id,
+                    ], 422);
+                }
+            }
+        }
+
+
         // Agrupar bloqueig per grups
         $bloqueos = $bloqueos1->concat($bloqueos2)->keyBy('bloqueo_grupo_id');
 
@@ -179,6 +230,9 @@ class ReservaController extends Controller
                 ]);
             }
         }
+
+        //Enviar email de confirmació
+        Mail::to($reserva->proveedor->email)->send(new ConfirmationMail($reserva));
 
         return response()->json([
             'message' => 'Reserva creada correctament.',
@@ -618,6 +672,128 @@ class ReservaController extends Controller
             'message' => 'Bloqueig actualitzat correctament',
             'data'    => $bloqueo
         ], 200);
+    }
+
+
+    /**
+     * @inicio
+     * @param date $inicio
+     * @param date $fin
+     * @return csv de las reservas entre esas fechas exactas
+    **/
+    public function generateReport(Request $request)
+    {
+        $request->validate([
+            'from' => 'required|date',
+            'to' => 'required|date|after_or_equal:from',
+        ]);
+
+        $from = $request->input('from');
+        $to = $request->input('to');
+
+        $fileName = 'reservas_' . now()->format('Ymd_His') . '.csv';
+
+        $headers = [
+            "ID Reserva",
+            "Comanda LF",
+            "Tipo camión",
+            "Material 1",
+            "Cantidad",
+            "SAP Proveedor",
+            "Nombre proveedor",
+            "Nombre abreviado proveedor",
+            "NIF/CIF proveedor",
+            "Nombre contacto proveedor",
+            "Email proveedor",
+            "Teléfono 1 proveedor",
+            "Teléfono 2 proveedor",
+            "Nombre transportista",
+            "Abreviado transportista",
+            "NIF transportista",
+            "Nombre contacto transportista",
+            "Email transportista",
+            "Teléfono 1 transportista",
+            "Teléfono 2 transportista",
+            "Matrícula camión",
+            "Hora inicio 1",
+            "Hora final 1",
+            "Nombre muelle 1",
+            "Descripción muelle 1",
+            "Estado",
+            "Aduana?",
+            "Creado el",
+            "Notas",
+            "Empresa",
+            "Descripción empresa",
+            "Teléfono",
+            "Material 2",
+            "Hora inicio 2",
+            "Hora final 2",
+            "Muelle 2",
+            "Descripción muelle 2",
+            "Cantidad 2"
+        ];
+
+        $reservas = Reserva::with(['tipoCamion', 'material', 'material1', 'proveedor', 'transporte', 'muelle1', 'muelle2', 'empresa', 'status'])
+            ->whereBetween('inicio1', [$from, $to])
+            ->get();
+
+
+        $callback = function () use ($reservas, $headers) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM UTF-8
+            fputcsv($handle, $headers, ';', '"');
+
+            foreach ($reservas as $reserva) {
+                fputcsv($handle, [
+                    $reserva->reserva_id,
+                    $reserva->pedido_LF,
+                    $reserva->tipoCamion->nombre ?? '',
+                    $reserva->material1->nombre ?? '',
+                    $reserva->cantidad1,
+                    $reserva->proveedor->codigo_sap ?? '',
+                    $reserva->proveedor->nombre ?? '',
+                    $reserva->proveedor->abreviatura ?? '',
+                    $reserva->proveedor->NIF ?? '',
+                    $reserva->proveedor->nombre_contacto ?? '',
+                    $reserva->proveedor->email ?? '',
+                    $reserva->proveedor->tel1 ?? '',
+                    $reserva->proveedor->tel2 ?? '',
+                    $reserva->transporte->nombre ?? '',
+                    $reserva->transporte->abreviatura ?? '',
+                    $reserva->transporte->NIF ?? '',
+                    $reserva->transporte->nombre_contacto ?? '',
+                    $reserva->transporte->email ?? '',
+                    $reserva->transporte->tel1 ?? '',
+                    $reserva->transporte->tel2 ?? '',
+                    $reserva->matricula_camion,
+                    $reserva->inicio1,
+                    $reserva->fin1,
+                    $reserva->muelle1->nombre ?? '',
+                    $reserva->muelle1->descripcion ?? '',
+                    $reserva->status->nombre ?? '',
+                    $reserva->es_aduana ? 1 : 0,
+                    $reserva->created_at,
+                    $reserva->notas,
+                    $reserva->empresa->nombre ?? '',
+                    $reserva->empresa->descripcion ?? '',
+                    $reserva->tel1,
+                    $reserva->tipo_material2_id->nombre ?? '',
+                    $reserva->inicio2,
+                    $reserva->fin2,
+                    $reserva->muelle2->nombre ?? '',
+                    $reserva->muelle2->descripcion ?? '',
+                    $reserva->cantidad2
+                ], ';', '"');
+            }
+
+            fclose($handle);
+        };
+
+        return response()->streamDownload($callback, $fileName, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename={$fileName}"
+        ]);
     }
 
 }

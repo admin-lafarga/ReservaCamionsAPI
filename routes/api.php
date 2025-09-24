@@ -26,6 +26,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BloqueoGrupoController;
 use App\Http\Controllers\BloqueoGrupoDetalleController;
 use App\Http\Controllers\RangoCantidadController;
+use Illuminate\Support\Facades\Mail;
+use App\Models\Reserva;
+use App\Mail\ConfirmationMail;
+
 
 Route::get('/', function (Request $request) {
     return response()->json([
@@ -46,7 +50,7 @@ Route::get('/authenticated', [AuthController::class, 'authenticated']);
 Route::post('/register', [AuthController::class, 'register']);
 // ###########################################################
 // 'auth:sanctum'
-Route::middleware(['auth:sanctum','web'])->group(function () {
+// Route::middleware(['auth:sanctum','web'])->group(function () {
     // LOGOUT
     Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -71,6 +75,7 @@ Route::middleware(['auth:sanctum','web'])->group(function () {
     Route::apiResource('tipomateriales', TipoMaterialController::class);
     Route::apiResource('materiales', MaterialController::class);
     Route::apiResource('roles', RolController::class);
+    Route::delete('restricciones/bulk-delete', [RestriccionController::class, 'bulkDelete']);
     Route::apiResource('restricciones', RestriccionController::class)->parameters(['restricciones' => 'restriccion']);
     Route::apiResource('status', StatusController::class);
     Route::apiResource('bloqueo/camion/material', BloqueoCamionMaterialController::class);
@@ -82,14 +87,14 @@ Route::middleware(['auth:sanctum','web'])->group(function () {
     Route::apiResource('bloqueo/grupos', BloqueoGrupoController::class);
     Route::apiResource('bloqueo/grupo/detalles', BloqueoGrupoDetalleController::class);
     Route::apiResource('rango/cantidad', RangoCantidadController::class);
-
+    Route::get('reservas/informe', [ReservaController::class, 'informeReservas']);
+    Route::post('report', [ReservaController::class, 'generateReport']);
 
     Route::get('/columns/{table}', function ($table) {
-        $allowedTables = ['materiales', 'usuarios', 'proveedores','bloqueo/grupos','transportes','empresas','muelles','users','tipo_camiones','status','reservas','horarios_muelles','tipo_proveedores'];
+        $allowedTables = ['materiales', 'usuarios', 'proveedores','bloqueo/grupos','transportes','empresas','muelles','users','tipo_camiones','status','reservas','horarios_muelles','tipo_proveedores', 'restricciones'];
         if (!in_array($table, $allowedTables)) {
             return response()->json(['error' => 'Taula no permesa'], 403);
         }
-
         try {
             $columns = DB::select("SHOW COLUMNS FROM `$table`");
             return response()->json($columns);
@@ -97,4 +102,10 @@ Route::middleware(['auth:sanctum','web'])->group(function () {
             return response()->json(['error' => 'Error carregant columnes: ' . $e->getMessage()], 500);
         }
     });
- });
+
+    Route::post('/send-test', function () {
+        $order = Reserva::first();
+        Mail::to('hassan.abbas@lafarga.es')->send(new ConfirmationMail($order));
+        return response()->json(['status' => 'ok', 'message' => 'Correo enviado']);
+    });
+//  });
