@@ -2,8 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\BloqueoGrupoMaterial;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,24 +16,21 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolSeeder::class,
             UserSeeder::class,
-            EmpresaSeeder::class,
+            EmpresaLfycsSeeder::class,
+            EntidadSeeder::class,
             TipoProveedorSeeder::class,
             ProveedorSeeder::class,
-            TipoMaterialSeeder::class,
             TipoCamionSeeder::class,
-            TipoMuelleSeeder::class,
-            MaterialSeeder::class,
             MuelleSeeder::class,
+            MaterialSeeder::class,
             HorarioMuelleSeeder::class,
-            TransporteSeeder::class,
-            StatusSeeder::class,
+            TransportistaSeeder::class,
+            EstadoSeeder::class,
             RestriccionSeeder::class,
-            BloqueoCamionMaterialSeeder::class,
-            PrivilegioSeeder::class,
             ReservaSeeder::class,
-            ControlMaterialMuelleSeeder::class,
-            BloqueoGrupoDetalleSeeder::class,
-            RangoCantidadSeeder::class
+            ParametroSeeder::class,
+            BloqueoGrupoMaterialSeeder::class,
+            BloqueoMuelleSeeder::class,
         ]);
     }
 }

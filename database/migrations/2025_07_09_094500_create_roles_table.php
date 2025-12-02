@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id('rol_id');
             $table->string('nombre');
             $table->string('descripcion');
-            $table->boolean('estado');
 
             $table->timestamps();
         });

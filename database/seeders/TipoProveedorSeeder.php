@@ -9,8 +9,8 @@ use App\Models\TipoProveedor;
 class TipoProveedorSeeder extends Seeder {
     public function run(): void {
         TipoProveedor::insert([
-            ['nombre' => 'Intern'],
-            ['nombre' => 'Extern']
+            ['nombre' => 'Intern', 'Descripcion' => 'Descripció Intern'],
+            ['nombre' => 'Extern', 'Descripcion' => 'Descripció Extern'],
         ]);
     }
 }

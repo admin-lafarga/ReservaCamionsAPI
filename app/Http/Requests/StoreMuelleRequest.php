@@ -23,14 +23,9 @@ class StoreMuelleRequest extends FormRequest
     {
         return [
             'descripcion' => 'required|string|max:255',
-            'zona' => 'required|string|max:255',
-            'nombre_muelle' => 'required|string|max:255|unique:muelles,nombre_muelle',
+            'nombre' => 'required|string|max:255|unique:muelles,nombre',
             'color' => 'required|string|max:255',
-            'numero' => 'required|numeric|max:255|unique:muelles,numero',
-            'estado' => 'required|boolean',
-            'abierto_festivos' => 'required|boolean',
-            'cantidad_acceptada' => 'required|numeric',
-            'empresa_id' => 'required|exists:empresas,empresa_id',
+            'empresa_lfycs_id' => 'required|exists:empresas_lfycs,empresa_lfycs_id',
         ];
     }
 }

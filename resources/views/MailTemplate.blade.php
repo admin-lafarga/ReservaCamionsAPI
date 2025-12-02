@@ -42,11 +42,11 @@
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;background-color:#f9fafb;padding:10px 16px;border-radius:8px;margin-bottom:8px;">
         <span style="font-weight:500;color:#6b7280;">Moll</span>
-        <span style="color:#111827;">{{$reserva->muelle1?->nombre_muelle}}</span>
+        <span style="color:#111827;">{{$reserva->muelle1?->nombre}}</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;background-color:#f9fafb;padding:10px 16px;border-radius:8px;margin-bottom:8px;">
         <span style="font-weight:500;color:#6b7280;">Material</span>
-        <span style="color:#111827;">{{$reserva->material?->nombre_material}}</span>
+        <span style="color:#111827;">{{$reserva->material?->nombre}}</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;background-color:#f9fafb;padding:10px 16px;border-radius:8px;margin-bottom:8px;">
         <span style="font-weight:500;color:#6b7280;">Notas</span>

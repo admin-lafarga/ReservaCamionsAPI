@@ -21,14 +21,14 @@ class StoreMaterialRequest extends FormRequest
      */
     public function rules(): array
     {
+        
         return [
-            'nombre' => 'required|string|max:255',
-            'estado' => 'required|boolean',
-            'codigo_sap' => 'required|string|max:255',
+            'nombre' => 'required|string|max:255|unique:materiales,nombre',
+            'codigo_sap' => 'required|string|max:255|unique:materiales,codigo_sap',
             'muelles' => 'required|array',
             'muelles.*.muelle_id' => 'required|integer|exists:muelles,muelle_id',
-            'trucks' => 'required|array',
-            'trucks.*.tipo_camion_id' => 'required|integer|exists:tipo_camiones,tipo_camion_id',
+            'tipo_camiones' => 'required|array',
+            'tipo_camiones.*.tipo_camion_id' => 'required|integer|exists:tipo_camiones,tipo_camion_id',
         ];
     }
 }

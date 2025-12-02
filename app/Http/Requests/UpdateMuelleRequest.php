@@ -25,14 +25,9 @@ class UpdateMuelleRequest extends FormRequest
 
         return [
             'descripcion' => 'required|string|max:255',
-            'zona' => 'required|string|max:255',
-            'nombre_muelle' => 'required|string|max:255|unique:muelles,nombre_muelle,' . $muelleId . ',muelle_id',
+            'nombre' => 'required|string|max:255|unique:muelles,nombre,' . $muelleId . ',muelle_id',
             'color' => 'required|string|max:255',
-            'numero' => 'required|numeric|max:255|unique:muelles,numero,' . $muelleId . ',muelle_id',
-            'estado' => 'required|boolean',
-            'abierto_festivos' => 'required|boolean',
-            'cantidad_acceptada' => 'required|numeric',
-            'empresa_id' => 'required|exists:empresas,empresa_id',
+            'empresa_lfycs_id' => 'required|exists:empresas_lfycs,empresa_lfycs_id',
         ];
     }
 }

@@ -13,16 +13,14 @@ return new class extends Migration
     {
         Schema::create('muelles', function (Blueprint $table) {
             $table->id('muelle_id');
-            $table->unsignedBigInteger('empresa_id');
-            $table->string('nombre_muelle');
+            $table->unsignedBigInteger('empresa_lfycs_id');
+            $table->string('nombre');
             $table->string('descripcion');
-            $table->integer('numero');
-            $table->string('zona');
-            $table->boolean('abierto_festivos')->nullable()->default(false);
             $table->string('color');
-            $table->boolean('estado')->nullable()->default(false);
             
             $table->timestamps();
+
+            $table->foreign('empresa_lfycs_id')->references('empresa_lfycs_id')->on('empresas_lfycs');
         });
     }
 

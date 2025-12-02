@@ -16,8 +16,7 @@ class StoreHorarioMuelleRequest extends FormRequest
     {
         return [
             'muelle_id' => 'required|exists:muelles,muelle_id',
-            'dia'       => 'required|string|max:50',
-            'num_dia'   => 'required|string|max:2',
+            'dia_semana'       => 'required|in:1,2,3,4,5,6,7',
             'inicio'    => 'required|date_format:H:i',
             'fin'       => 'required|date_format:H:i|after:inicio',
         ];
@@ -27,7 +26,7 @@ class StoreHorarioMuelleRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $exists = HorarioMuelle::where('muelle_id', $this->muelle_id)
-                ->where('num_dia', $this->num_dia)
+                ->where('dia_semana', $this->dia_semana)
                 ->exists();
 
             if ($exists) {

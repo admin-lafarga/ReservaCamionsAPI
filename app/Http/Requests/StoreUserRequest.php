@@ -26,6 +26,7 @@ class StoreUserRequest extends FormRequest
             'apellidos'  => 'required|string|max:255',
             'username'  => 'required|string|max:255',
             'email'      => 'required|string|email|max:255|unique:users,email',
+            'username'   => 'required|string|max:255|unique:users,username',
             'password'   => 'required|string|min:8',
             'PIN'        => 'required|string|max:10|unique:users,PIN',
             'NIF'        => 'nullable|string|max:20',

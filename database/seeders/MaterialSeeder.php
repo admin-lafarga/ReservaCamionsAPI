@@ -8,17 +8,25 @@ use App\Models\Material;
 
 class MaterialSeeder extends Seeder {
     public function run(): void {
-        Material::insert([
+        $mat1 = Material::create(
             [
                 'codigo_sap' => 'MAT001',
-                'nombre_material' => 'Material Demo',
-                'estado' => 1,
+                'nombre' => 'Material 1',
             ],
+        );
+
+        $mat2 = Material::create(
             [
-                'codigo_sap' => 'MATULA12',
-                'nombre_material' => 'Material test',
-                'estado' => 1,
+                'codigo_sap' => 'MAT002',
+                'nombre' => 'Material 2',
             ]
-        ]);
+        );
+
+        $mat1->tipo_camiones()->attach(1);
+        $mat2->tipo_camiones()->attach(2);
+        
+        $mat1->muelles()->attach(1);
+        $mat1->muelles()->attach(2);
+
     }
 }

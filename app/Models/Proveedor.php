@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Proveedor extends Model
 {
@@ -20,39 +21,37 @@ class Proveedor extends Model
     }
 
     protected $fillable = [
-        'codigo_sap',
-        'nombre',
-        'abreviatura',
-        'NIF',
-        'PIN',
-        'nombre_contacto',
+        'email_notificaciones',
+        'tipo_proveedor_id',
+        'entidad_id',
         'email',
-        'notificaciones_email',
-        'tel1',
-        'tel2',
-        'alerta',
-        'estado',
-        'tipo_proveedor_id'
+        'contraseña',
+        'codigo_sap'
     ];
+
+    protected $hidden = [
+        'contraseña',
+        'remember_token',
+    ];
+
+    public function entidad()
+    {
+        return $this->belongsTo(Entidad::class, 'entidad_id');
+    }
 
     public function tipoProveedor()
     {
         return $this->belongsTo(TipoProveedor::class, 'tipo_proveedor_id');
     }
 
-    // public function bloqueosCamionMaterial()
-    // {
-    //     return $this->hasMany(BloqueoCamionMaterial::class, 'proveedor_id');
-    // }
-
     public function reservas()
     {
         return $this->hasMany(Reserva::class, 'proveedor_id');
     }
 
-    public function transportes()
+    public function Carriers()
     {
-        return $this->hasMany(Transporte::class, 'proveedor_id');
+        return $this->hasMany(Transportista::class, 'proveedor_id');
     }
 
 }

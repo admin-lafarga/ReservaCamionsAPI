@@ -21,22 +21,29 @@ class UpdateProveedorRequest extends FormRequest
      */
     public function rules(): array
     {
-        $proveedorId = $this->route('proveedore')?->proveedor_id;
+        $proveedor = $this->route('proveedor');
+
+        $proveedorId = $proveedor?->proveedor_id; // <- para usar en las validaciones únicas de entidad
+        $entidadId = $proveedor?->entidad_id; // <- para usar en las validaciones únicas de entidad
 
         return [
+            // 🔹 Reglas del proveedor
             'tipo_proveedor_id' => 'required|exists:tipo_proveedores,tipo_proveedor_id',
-            'codigo_sap' => 'required|string|max:255',
-            'nombre' => 'required|string|max:255|unique:proveedores,nombre,' . $proveedorId . ',proveedor_id',
-            'abreviatura' => 'required|string|max:255',
-            'NIF' => 'required|string|max:50|unique:proveedores,NIF,' . $proveedorId . ',proveedor_id',
-            'PIN' => 'required|string|max:50|unique:proveedores,PIN,' . $proveedorId . ',proveedor_id',
-            'nombre_contacto' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:proveedores,email,' . $proveedorId . ',proveedor_id',
-            'notificaciones_email' => 'required|email|max:255|unique:proveedores,notificaciones_email,' . $proveedorId . ',proveedor_id',
-            'tel1' => ['required', 'regex:/^\+?[0-9\s\-]{6,20}$/'],
-            'tel2' => ['nullable', 'regex:/^\+?[0-9\s\-]{6,20}$/'],
-            'alerta' => 'boolean',
-            'estado' => 'boolean',
+            'email_notificaciones' => 'required|email|max:255|unique:proveedores,email_notificaciones,' . $proveedorId . ',proveedor_id',
+
+            // 🔹 Reglas de la entidad asociada
+            'entidad' => 'required|array',
+            'entidad.nombre' => 'required|string|max:255',
+            'entidad.abreviatura' => 'nullable|string|max:10',
+            'entidad.nif' => 'required|string|max:50|unique:entidades,nif,' . $entidadId . ',entidad_id',
+            'entidad.pin' => 'required|string|max:255',
+            'entidad.email' => 'required|email|unique:entidades,email,' . $entidadId . ',entidad_id',
+            'entidad.telefono1' => 'nullable|string|max:20|unique:entidades,telefono1,' . $entidadId . ',entidad_id',
+            'entidad.telefono2' => 'nullable|string|max:20|unique:entidades,telefono2,' . $entidadId . ',entidad_id',
+            'entidad.alerta' => 'required|boolean',
+            'entidad.codigo_sap' => 'nullable|string|max:50',
+            'entidad.idioma' => 'nullable|string|max:5',
+            'entidad.nombre_contacto' => 'nullable|string|max:255',
         ];
     }
 }

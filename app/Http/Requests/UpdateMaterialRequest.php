@@ -21,15 +21,14 @@ class UpdateMaterialRequest extends FormRequest
      */
     public function rules(): array
     {
-        $materialId = $this->route('materiale')?->material_id;
+        $materialId = $this->route('material')?->material_id;
         return [
-            'nombre' => 'required|string|max:255|unique:materiales,nombre_material,' . $materialId . ',material_id',
-            'estado' => 'required|boolean',
-            'codigo_sap' => 'required|string|max:255',
+            'nombre' => 'required|string|max:255|unique:materiales,nombre,' . $materialId . ',material_id',
+            'codigo_sap' => 'required|string|max:255|unique:materiales,codigo_sap,' . $materialId . ',material_id',
             'muelles' => 'required|array',
             'muelles.*.muelle_id' => 'required|integer|exists:muelles,muelle_id',
-            'trucks' => 'required|array',
-            'trucks.*.tipo_camion_id' => 'required|integer|exists:tipo_camiones,tipo_camion_id',
+            'tipo_camiones' => 'required|array',
+            'tipo_camiones.*.tipo_camion_id' => 'required|integer|exists:tipo_camiones,tipo_camion_id',
         ];
     }
 }

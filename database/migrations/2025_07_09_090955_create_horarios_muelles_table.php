@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('horarios_muelles', function (Blueprint $table) {
             $table->id('horarios_muelle_id');
             $table->unsignedBigInteger('muelle_id');
-            $table->string('dia');
-            $table->string('dia_semana');
+            $table->integer('dia_semana');
             $table->time('inicio');
             $table->time('fin');
 

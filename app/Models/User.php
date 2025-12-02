@@ -19,16 +19,16 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'nombre',
         'apellidos',
-        'username',
         'email',
+        'username',
         'password',
-        'PIN',
+        // 'PIN',
         'NIF',
-        'tel1',
+        'telefono',
+        'idioma',
         'rol_id',
-        'estado',
     ];
 
     /**
@@ -59,14 +59,11 @@ class User extends Authenticatable
         return $this->belongsTo(Rol::class, 'rol_id');
     }
 
-    public function bloqueosCamionMaterial()
-    {
-        return $this->hasMany(Bloqueo_Camion_Material::class, 'usuario_id');
-    }
 
-    public function bloqueosKgMaterial()
+    //Revisar si realmente hace falta o no
+    public function bloqueoMateriales()
     {
-        return $this->hasMany(Bloqueo_Kg_Material::class, 'usaurio_id');
+        return $this->hasMany(BloqueoGrupoMaterial::class, 'usaurio_id');
     }
 
 }

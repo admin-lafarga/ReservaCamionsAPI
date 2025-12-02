@@ -12,13 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('rol_id');
-            $table->string('apellidos');
-            $table->string('PIN');
-            $table->string('NIF')->unique();
-            $table->string('tel1')->unique();
-            $table->boolean('estado')->default(true);
-
+            $table->string('NIF')->nullable();
+            $table->string('tel1')->nullable();
+            $table->enum('idioma',['es', 'cat', 'fr', 'en'])->default('es');
+            $table->unsignedBigInteger('rol_id')->after('id')->default(3);
+            $table->string('contraseña_antigua')->nullable();
 
             $table->foreign('rol_id')->references('rol_id')->on('roles')->onDelete('cascade');
         });
@@ -30,16 +28,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-        // Eliminar la foreign key primero
-        $table->dropForeign(['rol_id']);
-
-        // Luego eliminar las columnas
-        $table->dropColumn('rol_id');
-        $table->dropColumn('apellidos');
-        $table->dropColumn('PIN');
         $table->dropColumn('NIF');
         $table->dropColumn('tel1');
-        $table->dropColumn('estado');
+        $table->dropColumn('idioma');
     });
     }
 };

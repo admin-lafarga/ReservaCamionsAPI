@@ -20,20 +20,33 @@ class Material extends Model
 
     protected $fillable = [
         'codigo_sap',
-        'nombre_material',
-        'estado',
-        'camiones_permitidos',
-        'muelles_permitidos',
-        'max_concurrencia',
+        'nombre',
+        '',
     ];
 
-    public function controlMaterialMuelle()
+
+    public function reservas1()
     {
-        return $this->hasMany(ControlMaterialMuelle::class, 'material_id');
+        return $this->hasMany(Reserva::class, 'material1_id');
     }
 
-    public function bloqueosKgMaterial()
+    public function reservas2()
     {
-        return $this->hasMany(BloqueoKgMaterial::class, 'material_id');
+        return $this->hasMany(Reserva::class, 'material2_id');
+    }
+
+    public function tipo_camiones()
+    {
+        return $this->belongsToMany(TipoCamion::class, 'material_tipo_camiones', 'material_id', 'tipo_camion_id');
+    }
+
+    public function muelles()
+    {
+        return $this->belongsToMany(Muelle::class, 'material_muelles', 'material_id', 'muelle_id');
+    }
+
+    public function bloqueoMateriales()
+    {
+        return $this->hasMany(BloqueoGrupoMaterialDetalle::class, 'material_id');
     }
 }

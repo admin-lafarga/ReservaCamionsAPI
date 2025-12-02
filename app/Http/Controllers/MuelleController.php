@@ -14,20 +14,13 @@ class MuelleController extends Controller
     public function index()
     {
         $muelles = Muelle::with([
-            'empresa:empresa_id,nombre',
-            'horarios:horarios_muelle_id,muelle_id,num_dia,inicio,fin'
+            'empresa_lfycs:empresa_lfycs_id,nombre',
+            'horarios:horarios_muelle_id,muelle_id,dia_semana,inicio,fin',
         ])->get();
 
         return response()->json($muelles);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -46,16 +39,9 @@ class MuelleController extends Controller
      */
     public function show(Muelle $muelle)
     {
-        //
+        return response()->json($muelle);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Muelle $muelle)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -71,9 +57,14 @@ class MuelleController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * Elimina también los horarios asociados debido a la relación de dependencia en la base de datos.
      */
     public function destroy(Muelle $muelle)
     {
-        //
+        $muelle->delete();
+
+        return response()->json([
+            'message' => 'Muelle & Horarios eliminados correctamente',
+        ]);
     }
 }

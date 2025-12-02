@@ -12,6 +12,7 @@ class Rol extends Model
 
     protected $table = 'roles';
     protected $primaryKey = 'rol_id';
+    protected $hidden = ['pivot'];
 
     public function getRouteKeyName()
     {
@@ -21,11 +22,15 @@ class Rol extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
-        'estado',
     ];
-    public function users()
+
+    public function usuarios()
     {
-        return $this->hasMany(User::class, 'rol_id');
+        return $this->hasMany(User::class, 'usuario_roles', 'rol_id', 'usuario_id');
     }
 
+    public function permisos()
+    {
+        return $this->belongsToMany(Permiso::class, 'rol_permisos', 'rol_id', 'permiso_id');
+    }
 }

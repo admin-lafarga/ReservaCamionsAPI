@@ -10,6 +10,7 @@ class Muelle extends Model
     /** @use HasFactory<\Database\Factories\MollFactory> */
     use HasFactory;
     protected $table = 'muelles';
+    protected $hidden = ['pivot'];
 
     protected $primaryKey = 'muelle_id';
 
@@ -19,19 +20,16 @@ class Muelle extends Model
     }
 
     protected $fillable = [
-        'empresa_id',
-        'nombre_muelle',
+        'empresa_lfycs_id',
+        'nombre',
         'descripcion',
-        'numero',
-        'zona',
-        'abierto_festivos',
         'color',
         'estado',
     ];
 
-    public function empresa()
+    public function empresa_lfycs()
     {
-        return $this->belongsTo(Empresa::class, 'empresa_id');
+        return $this->belongsTo(EmpresaLfycs::class, 'empresa_lfycs_id');
     }
 
     public function horarios()
@@ -47,5 +45,15 @@ class Muelle extends Model
     public function reservas2()
     {
         return $this->hasMany(Reserva::class, 'muelle2_id');
+    }
+
+    public function materiales()
+    {
+        return $this->belongsToMany(Material::class, 'material_muelles', 'muelle_id', 'material_id');
+    }
+
+    public function bloqueos()
+    {
+        return $this->hasMany(BloqueoMuelle::class, 'muelle_id');
     }
 }

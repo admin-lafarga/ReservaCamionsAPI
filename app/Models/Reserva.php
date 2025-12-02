@@ -19,27 +19,24 @@ class Reserva extends Model
 
     protected $fillable = [
         'tipo_camion_id',
-        'tipo_material1_id',
-        'tipo_material2_id',
+        'material1_id',
+        'material2_id',
         'proveedor_id',
-        'transporte_id',
-        'muelle1_id',
-        'muelle2_id',
-        'status_id',
-        'empresa_id',
+        'transportista_id',
+        'muelle_id',
+        'estado_id',
+        'empresa_lfycs_id',
         'cantidad1',
         'cantidad2',
-        'pedido_LF',
+        'pedido1',
+        'pedido2',
         'matricula_camion',
-        'inicio1',
-        'fin1',
-        'inicio2',
-        'fin2',
-        'es_aduana',
+        'inicio',
+        'fin',
+        'duracion',
+        'aduana',
         'notas',
-        'tel1',
-        'duracion1',
-        'duracion2'
+        'telefono',
     ];
 
     public function tipoCamion()
@@ -47,14 +44,14 @@ class Reserva extends Model
         return $this->belongsTo(TipoCamion::class, 'tipo_camion_id');
     }
 
-    public function material()
-    {
-        return $this->belongsTo(Material::class, 'tipo_material1_id');
-    }
-
     public function material1()
     {
-        return $this->belongsTo(Material::class, 'tipo_material2_id');
+        return $this->belongsTo(Material::class, 'material1_id');
+    }
+
+    public function material2()
+    {
+        return $this->belongsTo(Material::class, 'material2_id');
     }
 
     public function proveedor()
@@ -62,30 +59,22 @@ class Reserva extends Model
         return $this->belongsTo(Proveedor::class, 'proveedor_id');
     }
 
-    public function transporte()
+    public function transportista()
     {
-        return $this->belongsTo(Transporte::class, 'transporte_id');
+        return $this->belongsTo(Transportista::class, 'transportista_id');
     }
 
-    public function muelle1()
+    public function muelle()
     {
-        return $this->belongsTo(Muelle::class, 'muelle1_id');
+        return $this->belongsTo(Muelle::class, 'muelle_id');
     }
 
-    public function muelle2()
+
+    public function estado()
     {
-        return $this->belongsTo(Muelle::class, 'muelle2_id');
+        return $this->belongsTo(Estado::class, 'estado_id');
     }
 
-    public function status()
-    {
-        return $this->belongsTo(Status::class, 'status_id');
-    }
-
-    public function empresa()
-    {
-        return $this->belongsTo(Empresa::class, 'empresa_id');
-    }
 
     public function documentos()
     {

@@ -9,8 +9,8 @@ class HorarioMuelle extends Model
 {
     /** @use HasFactory<\Database\Factories\MollHorariFactory> */
     use HasFactory;
+    
     protected $table = 'horarios_muelles';
-
     protected $primaryKey = 'horarios_muelle_id';
 
     public function getRouteKeyName()
@@ -20,8 +20,7 @@ class HorarioMuelle extends Model
 
     protected $fillable = [
         'muelle_id',
-        'dia',
-        'num_dia',
+        'dia_semana',
         'inicio',
         'fin',
     ];

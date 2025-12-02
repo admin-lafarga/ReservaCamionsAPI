@@ -10,17 +10,26 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
-            'name' => 'admin',
-            'username' => 'sAdmin',
+        $admin = User::create([
+            'nombre' => 'admin',
             'apellidos' => 'Principal',
-            'email' => 'a.a@a.es',
-            'password' => Hash::make('123456'),
-            'PIN' => '1234',
+            'email' => 'admin@lafarga.es',
+            'contraseña' => Hash::make('123456'),
             'NIF' => '12345678A',
             'tel1' => '123456789',
-            'rol_id' => 1,
-            'estado' => 1,
         ]);
+
+        $user = User::create([
+            'nombre' => 'user',
+            'apellidos' => 'Secundario',
+            'email' => 'user@mail.com',
+            'contraseña' => Hash::make('123456'),
+            'NIF' => '87654321B',
+            'tel1' => '987654321',
+        ]);
+
+        $admin->roles()->attach(1); // Asignar rol de administrador
+        $user->roles()->attach(2); // Asignar rol de administrador
+
     }
 }

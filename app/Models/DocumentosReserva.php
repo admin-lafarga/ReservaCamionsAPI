@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DocumentosReserva extends Model
 {
+    protected $table = 'documentos_reserva';
     protected $primaryKey = 'documento_reserva_id';
 
     public function getRouteKeyName()
@@ -16,12 +17,14 @@ class DocumentosReserva extends Model
     protected $fillable = [
         'reserva_id',
         'url',
-        'name'
+        'nombre'
     ];
 
     public function reserva()
     {
         return $this->belongsTo(Reserva::class, 'reserva_id');
     }
+
+
 
 }

@@ -26,9 +26,11 @@ class MaterialController extends Controller
         }
 
         $query = Material::with([
-            'controlMaterialMuelle.tipoCamion:tipo_camion_id,nombre',
-            'controlMaterialMuelle.muelle:muelle_id,nombre_muelle'
+            'tipo_camiones',
+            'muelles'
         ]);
+
+        
 
         if (!empty($ids)) {
             $materials = $query->whereIn('material_id', $ids)->get();
@@ -40,53 +42,42 @@ class MaterialController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreMaterialRequest $request)
     {
-        $data = $request->validated();
+        $transportista = $request->validated();
+        
 
         // Ho faig amb un transaction, assegurar que es completin tots els inserts
         // i en el cas que en falli algun no es crei el material.
-        DB::beginTransaction();
         try {
-            // Crear el material
-            $material = Material::create([
-                'codigo_sap' => $data['codigo_sap'],
-                'nombre_material' => $data['nombre'],
-                'estado' => $data['estado'],
-            ]);
-
-            // Crear control_material_muelle combinando cada truck con cada muelle
-            foreach ($data['trucks'] as $truck) {
-                foreach ($data['muelles'] as $muelle) {
-                    ControlMaterialMuelle::create([
-                        'material_id' => $material->material_id,
-                        'tipo_camion_id' => $truck['tipo_camion_id'],
-                        'muelle_id' => $muelle['muelle_id'],
-                    ]);
+            DB::transaction(function () use ($transportista, $request) {
+                // Crear el material
+                $material = Material::create([
+                    'codigo_sap' => $transportista['codigo_sap'],
+                    'nombre' => $transportista['nombre'],
+                ]);
+                
+                // Relacionar tipo_camiones
+                foreach($request['tipo_camiones'] as $camion ){
+                    $material->tipo_camiones()->attach($camion['tipo_camion_id']);
                 }
-            }
 
-            DB::commit();
+                 // Relacionar muelles
+                 foreach($request['muelles'] as $muelle ){
+                    $material->muelles()->attach($muelle['muelle_id']);
+                 }
+            });
 
             return response()->json([
-                'message' => 'Material y controles creados correctamente.',
+                'message' => 'Material creado correctamente.',
             ], 201);
 
         } catch (\Throwable $e) {
-            DB::rollBack();
             return response()->json([
                 'message' => 'Error al crear el material.',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -94,99 +85,73 @@ class MaterialController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Material $materiale)
+    public function show(Material $material)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Material $materiale)
-    {
-        //
+        return response()->json($material);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateMaterialRequest $request, Material $materiale)
+    public function update(UpdateMaterialRequest $request, Material $material)
     {
         $data = $request->validated();
 
-        DB::beginTransaction();
         try {
-            // Actualitzar camps del material
-            $materiale->update([
-                'codigo_sap' => $data['codigo_sap'],
-                'nombre_material' => $data['nombre'],
-                'estado' => $data['estado'],
-                // 'camiones_permitidos' => 'tots',
-                // 'muelles_permitidos' => 'tots',
-                // 'max_concurrencia' => 'infinit',
-            ]);
+            DB::transaction(function ( ) use ($material, $data) {
+                $material->update([
+                    'codigo_sap' => $data['codigo_sap'],
+                    'nombre' => $data['nombre'],
+                ]);
 
-            // Obtenir combinacions actuals
-            $existingControls = $materiale->controlMaterialMuelle()->get()->map(function ($item) {
-                return [
-                    'tipo_camion_id' => $item->tipo_camion_id,
-                    'muelle_id' => $item->muelle_id,
-                ];
-            })->toArray();
-
-            // Obtenir combinacions noves des del formulari
-            $newControls = [];
-            foreach ($data['trucks'] as $truck) {
-                foreach ($data['muelles'] as $muelle) {
-                    $newControls[] = [
-                        'tipo_camion_id' => $truck['tipo_camion_id'],
-                        'muelle_id' => $muelle['muelle_id'],
-                    ];
-                }
-            }
-
-            // Afegir els nous que no existeixen
-            foreach ($newControls as $control) {
-                if (!in_array($control, $existingControls)) {
-                    ControlMaterialMuelle::create([
-                        'material_id' => $materiale->material_id,
-                        'tipo_camion_id' => $control['tipo_camion_id'],
-                        'muelle_id' => $control['muelle_id'],
-                    ]);
-                }
-            }
-
-            // Eliminar els que ja no hi són al formulari
-            foreach ($existingControls as $control) {
-                if (!in_array($control, $newControls)) {
-                    ControlMaterialMuelle::where('material_id', $materiale->material_id)
-                        ->where('tipo_camion_id', $control['tipo_camion_id'])
-                        ->where('muelle_id', $control['muelle_id'])
-                        ->delete();
-                }
-            }
-
-            DB::commit();
+                $material->tipo_camiones()->sync(
+                    collect($data['tipo_camiones'])->pluck('tipo_camion_id')->toArray()
+                );
+                $material->muelles()->sync(
+                    collect($data['muelles'])->pluck('muelle_id')->toArray()
+                );
+                
+            });
 
             return response()->json([
-                'message' => 'Material actualitzat correctament.',
+                'message' => 'Material actualitzado correctamente.',
             ], 200);
 
         } catch (\Throwable $e) {
-            DB::rollBack();
             return response()->json([
-                'message' => 'Error al actualitzar el material.',
+                'message' => 'Error al actualizar el material.',
                 'error' => $e->getMessage()
             ], 500);
         }
+
+        // $request->validate([
+        //     'nombre' => 'required|string|max:255',
+        //     'tipo_camion_ids' => 'array',
+        //     'muelle_ids' => 'array',
+        // ]);
+
+        // $material->update([
+        //     'nombre' => $request->nombre
+        // ]);
+
+        // // Actualizar relaciones
+        // $material->tiposCamion()->sync($request->tipo_camion_ids ?? []);
+        // $material->muelles()->sync($request->muelle_ids ?? []);
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Material $materiale)
+    public function destroy(Material $material)
     {
-        //
+        $material->tipo_camiones()->detach();
+        $material->muelles()->detach();
+        $material->delete();
+
+        return response()->json([
+            'message' => 'Material eliminado correctamente',
+        ], 200);
     }
 
     // Controlador

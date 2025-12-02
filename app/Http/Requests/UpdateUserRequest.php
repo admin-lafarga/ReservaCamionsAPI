@@ -32,6 +32,7 @@ class UpdateUserRequest extends FormRequest
             'username' => 'required|string|max:255|unique:users,username,'. $userId . ',id',
             'apellidos' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'. $userId . ',id',
+            'username' => 'required|string|max:255|unique:users,username,'. $userId . ',id',
             'password' => 'nullable|string|min:8',
             'PIN' => 'required|string|max:10|unique:users,PIN,'. $userId . ',id',
             'NIF' => 'nullable|string|max:20',

@@ -25,10 +25,8 @@ class StoreTipoCamionRequest extends FormRequest
             'nombre'            => ['required', 'string', 'max:255'],
             'descripcion'       => ['nullable', 'string', 'max:500'],
             'materiales'        => ['nullable', 'string'],
-            'tiempo_descarga_a'  => ['required', 'integer', 'min:0'],
-            'tiempo_descarga_b'  => ['required', 'integer', 'min:0'],
+            'tiempo_descarga_1'  => ['required', 'integer', 'min:0'],
             'muelles_permitidos'=> ['nullable', 'string'],
-            'estado'            => ['required', 'boolean'],
             'bloqueo_muelles'   => ['required', 'boolean'],
         ];
     }
