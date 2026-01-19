@@ -22,17 +22,15 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'       => 'required|string|max:255',
+            'nombre'       => 'required|string|max:255',
             'apellidos'  => 'required|string|max:255',
-            'username'  => 'required|string|max:255',
             'email'      => 'required|string|email|max:255|unique:users,email',
             'username'   => 'required|string|max:255|unique:users,username',
-            'password'   => 'required|string|min:8',
-            'PIN'        => 'required|string|max:10|unique:users,PIN',
+            'contraseña'   => 'required|string|min:8',
             'NIF'        => 'nullable|string|max:20',
             'tel1'       => 'nullable|string|max:50',
             'rol_id'     => 'required|exists:roles,rol_id',
-            'estado'     => 'required|boolean',
+            'idioma'    => 'required|in:es,en,fr,cat',
         ];
     }
 }

@@ -24,8 +24,8 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
-        $data['password'] = Hash::make($data['password']);
 
+        $data['contraseña'] = Hash::make($data['contraseña']);
         $user = User::create($data);
 
         return response()->json([
@@ -49,10 +49,10 @@ class UserController extends Controller
     {
         $data = $request->validated();
 
-        if (!empty($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
+        if (!empty($data['contraseña'])) {
+            $data['contraseña'] = Hash::make($data['contraseña']);
         } else {
-            unset($data['password']);
+            unset($data['contraseña']);
         }
 
         $user->update($data);

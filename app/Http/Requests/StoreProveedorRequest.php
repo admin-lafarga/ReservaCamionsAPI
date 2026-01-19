@@ -23,7 +23,8 @@ class StoreProveedorRequest extends FormRequest
     {
         return [
             'tipo_proveedor_id' => 'required|exists:tipo_proveedores,tipo_proveedor_id',
-            'email_notificaciones' => 'required|email|max:255|unique:proveedores,email_notificaciones',
+            'email_notificaciones' => 'required|email|max:255',
+            'codigo_sap' => 'nullable|string',
             'entidad' => 'required|array',
             'entidad.nombre' => 'required|string|max:255',
             'entidad.abreviatura' => 'nullable|string|max:10',
@@ -33,8 +34,7 @@ class StoreProveedorRequest extends FormRequest
             'entidad.telefono1' => 'nullable|string|max:20',
             'entidad.telefono2' => 'nullable|string|max:20',
             'entidad.alerta' => 'required|boolean',
-            'entidad.codigo_sap' => 'nullable|string|max:50',
-            'entidad.idioma' => 'nullable|string|max:5',
+            // 'entidad.idioma' => 'nullable|string|max:5',
             'entidad.nombre_contacto' => 'nullable|string|max:255',
         ];
     }

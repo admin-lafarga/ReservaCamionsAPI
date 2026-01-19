@@ -388,7 +388,7 @@ def migrar_entidades(old_cur, new_cur, tipo_proveedor_map):
             None
         ))
 
-        proveedor_map[old_id] = entidad_id
+        proveedor_map[old_id] = new_cur.lastrowid
 
     # ---------- TRANSPORTISTAS ----------
     old_cur.execute("""

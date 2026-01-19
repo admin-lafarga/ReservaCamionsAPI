@@ -34,7 +34,7 @@ return [
     |
     */
 
-    'guard' => ['web'],
+    'guard' => ['web', 'entidad'],
 
     /*
     |--------------------------------------------------------------------------
@@ -80,5 +80,16 @@ return [
         'encrypt_cookies' => Illuminate\Cookie\Middleware\EncryptCookies::class,
         'validate_csrf_token' => Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
     ],
+
+
+ /*
+    |--------------------------------------------------------------------------
+    | Sanctum URL Prefix
+    |--------------------------------------------------------------------------
+    |
+    | Añadido manualmente para añadir el prefijo de /api a la ruta de sanctum
+    |
+    */
+    'prefix' => 'api/sanctum', 
 
 ];

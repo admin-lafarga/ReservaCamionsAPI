@@ -113,6 +113,7 @@ class AuthController extends Controller
         if ($loginExitoso) {
             RateLimiter::clear($keyIpLogin);
             RateLimiter::clear($keyLoginOnly);
+            
 
             if ($user instanceof User) {
                 Auth::guard('web')->login($user);
@@ -125,6 +126,10 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Login correcte',
                 'user' => $user,
+                'instance' => $user instanceof User ? 'usuario' : 'entidad',
+                'proveedor' => $user->proveedor ?? null,
+                'transportista' => $user->Carrier ?? null,
+                'logged' => true,
             ]);
         } else {
             return response()->json(['message' => 'Credencials incorrectes'], 401);
@@ -150,9 +155,19 @@ class AuthController extends Controller
     }
 
 
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::user()->currentAccessToken()->delete();
+        if (Auth::guard('web')->check()) {
+            Auth::guard('web')->logout();
+        }
+
+        if (Auth::guard('entidad')->check()) {
+            Auth::guard('entidad')->logout();
+        }
+
+        // 3. Limpieza de seguridad de la sesión de PHP
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json([
             'message' => 'Sesión cerrada'
@@ -199,15 +214,17 @@ class AuthController extends Controller
 
         if (Auth::guard('web')->check()) {
             $user = Auth::guard('web')->user();
-            $instance = 'User';
+            $instance = 'usuario';
         } elseif (Auth::guard('entidad')->check()) {
             $user = Auth::guard('entidad')->user();
-            $instance = 'Entidad';
+            $instance = 'entidad';
         }
 
         return response()->json([
             'user' => $user,
             'instance' => $instance,
+            'proveedor' => $user->proveedor ?? null,
+            'transportista' => $user->Carrier ?? null,
             'logged' => $user !== null,
         ]);
     }

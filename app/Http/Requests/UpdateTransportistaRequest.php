@@ -37,7 +37,7 @@ class UpdateTransportistaRequest extends FormRequest
             'entidad.telefono2' => 'nullable|string|max:20|unique:entidades,telefono2,' . $entidadId . ',entidad_id',
             'entidad.alerta' => 'required|boolean',
             'entidad.codigo_sap' => 'nullable|string|max:50',
-            'entidad.idioma' => 'nullable|string|max:5',
+            // 'entidad.idioma' => 'nullable|string|max:5',
             'entidad.nombre_contacto' => 'nullable|string|max:255',
         ];
     }

@@ -8,7 +8,9 @@ use App\Models\Reserva;
 use App\Models\DocumentosReserva;
 use App\Models\Proveedor;
 use App\Models\BloqueoGrupoMaterial;
+use App\Models\Entidad;
 use App\Models\Restriccion;
+use App\Models\Transportista;
 use Illuminate\Http\Request;
 
 class ReservaController extends Controller
@@ -17,9 +19,12 @@ class ReservaController extends Controller
      * Display a listing of the resource.
      */
     // Llistat de reservas CRUD
-    public function index()
+    public function index(Request $request)
     {
-        $reservas = Reserva::with([
+        $user = $request->user();
+
+        // 1. Definimos las relaciones en un solo lugar para evitar repetición
+        $relations = [
             'documentos',
             'proveedor.entidad',
             'tipoCamion:tipo_camion_id,nombre',
@@ -28,9 +33,26 @@ class ReservaController extends Controller
             'muelle',
             'estado',
             'transportista'
-        ])->get();
+        ];
 
-        return response()->json($reservas);
+        $query = Reserva::with($relations);
+
+        // 2. Aplicamos filtros si es una Entidad
+        if ($user instanceof Entidad) {
+            $query->where(function ($q) use ($user) {
+                // Buscamos si es proveedor
+                $q->whereHas('proveedor', function ($pq) use ($user) {
+                    $pq->where('entidad_id', $user->entidad_id);
+                })
+                    // O si es transportista
+                    ->orWhereHas('transportista', function ($tq) use ($user) {
+                        $tq->where('entidad_id', $user->entidad_id);
+                    });
+            });
+        }
+
+        // 3. Si no es Entidad, es User, el query sigue sin filtros y trae todo
+        return response()->json($query->get());
     }
 
     // Llistat de reserves Calendari

@@ -32,6 +32,7 @@ class ProveedorController extends Controller
         $entidad->proveedor()->create([
             'tipo_proveedor_id' => $request->validated()['tipo_proveedor_id'],
             'email_notificaciones' => $request->validated()['email_notificaciones'],
+            'codigo_sap' => $request->validated()['codigo_sap'],
         ]);
 
         return response()->json([
@@ -77,7 +78,7 @@ class ProveedorController extends Controller
     public function destroy(Proveedor $proveedor)
     {
         $tieneReservas = $proveedor->reservas()
-            ->whereDate('inicio1', '>=', Carbon::today())
+            ->whereDate('inicio', '>=', Carbon::today())
             ->exists();
 
         if ($tieneReservas) {

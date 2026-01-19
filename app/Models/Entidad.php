@@ -46,11 +46,11 @@ class Entidad extends Authenticatable
 
     public function proveedor()
     {
-        return $this->hasMany(Proveedor::class, 'entidad_id');
+        return $this->hasOne(Proveedor::class, 'entidad_id');
     }
 
     public function Carrier()
     {
-        return $this->hasMany(Transportista::class, 'entidad_id');
+        return $this->hasOne(Transportista::class, 'entidad_id');
     }
 }

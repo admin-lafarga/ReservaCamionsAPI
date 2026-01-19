@@ -6,6 +6,8 @@ use App\Http\Requests\StoreTransportistaRequest;
 use App\Http\Requests\UpdateTransportistaRequest;
 use App\Models\Transportista;
 use App\Models\Entidad;
+use Carbon\Carbon;
+
 
 
 class TransportistaController extends Controller
@@ -68,6 +70,22 @@ class TransportistaController extends Controller
      */
     public function destroy(Transportista $transportista)
     {
-        //
+         $tieneReservas = $transportista->reservas()
+            ->whereDate('inicio', '>=', Carbon::today())
+            ->exists();
+
+        if ($tieneReservas) {
+            return response()->json([
+                'proveedor' => $transportista,
+                'message' => 'No se puede desactivar el proveedor porque tiene reservas activas',
+            ], 422);
+        }
+        $transportista->entidad()->delete();
+        $transportista->delete();
+
+        return response()->json([
+            'message' => 'Proveedor desactivado correctamente.'
+        ]);
+
     }
 }
