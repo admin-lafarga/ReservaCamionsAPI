@@ -23,6 +23,7 @@ use App\Http\Controllers\EstadoController;
 use App\Http\Controllers\ParametroController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\TransportistaController;
+use App\Http\Controllers\EntidadController;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Reserva;
 use App\Mail\ConfirmationMail;
@@ -75,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class);
     Route::apiResource('proveedores', ProveedorController::class)->parameter('proveedores', 'proveedor');
     Route::apiResource('transportistas', TransportistaController::class);
+    Route::put('/entidades/{entidad}', [EntidadController::class, 'update']);
     Route::apiResource('tipoproveedores', TipoProveedorController::class)->parameters(['tipoproveedores' => 'tipoProveedor']);
     Route::apiResource('tipocamiones', TipoCamionController::class);
     Route::apiResource('materiales', MaterialController::class)->Parameter('materiales', 'material');

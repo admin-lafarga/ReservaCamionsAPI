@@ -14,9 +14,8 @@ class ProveedorSeeder extends Seeder {
             [
                 'entidad_id' => 1,
                 'tipo_proveedor_id' => 1,
-                'email_notificaciones' => false,
-                'email' => 'proveedor1@lafarga.es',
-                'contraseña' => Hash::make('123456'),
+                'email_notificaciones' => 'proveedor1@lafarga.es',
+                'codigo_sap' => 'ENT001',
 
             ]
         ]);

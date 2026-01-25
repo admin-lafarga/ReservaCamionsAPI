@@ -24,7 +24,6 @@ class EntidadSeeder extends Seeder
                 'telefono1' => '600000001',
                 'alerta' => true,
                 'idioma' => 'es',
-                'codigo_sap' => 'ENT001',
             ],
             [
                 'nombre' => 'Transportista 1', 
@@ -36,7 +35,6 @@ class EntidadSeeder extends Seeder
                 'telefono1' => '600000002',
                 'alerta' => false,
                 'idioma' => 'es',
-                'codigo_sap' => 'ENT002',
         ],
         ]);
     }

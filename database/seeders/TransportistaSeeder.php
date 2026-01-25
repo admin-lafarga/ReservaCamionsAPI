@@ -14,8 +14,6 @@ class TransportistaSeeder extends Seeder {
             [
                 'entidad_id' => 2,
                 'puede_gestionar' => true,
-                'email' => 'Entidad2@lafarga.es',
-                'contraseña' => Hash::make('123456'),
             ],
         ]);
     }

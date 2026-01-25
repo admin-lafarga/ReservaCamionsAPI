@@ -11,8 +11,10 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $admin = User::create([
+            'rol_id' => 1, // Administrador
             'nombre' => 'admin',
             'apellidos' => 'Principal',
+            'username' => 'admin',
             'email' => 'admin@lafarga.es',
             'contraseña' => Hash::make('123456'),
             'NIF' => '12345678A',
@@ -20,16 +22,15 @@ class UserSeeder extends Seeder
         ]);
 
         $user = User::create([
+            'rol_id' => 2, // Editor
             'nombre' => 'user',
             'apellidos' => 'Secundario',
+            'username' => 'user',
             'email' => 'user@mail.com',
             'contraseña' => Hash::make('123456'),
             'NIF' => '87654321B',
             'tel1' => '987654321',
         ]);
-
-        $admin->roles()->attach(1); // Asignar rol de administrador
-        $user->roles()->attach(2); // Asignar rol de administrador
 
     }
 }
