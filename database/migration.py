@@ -14,11 +14,11 @@ OLD_DB = {
 }
 
 NEW_DB = {
-    'host': 'localhost',
-    'port': 3307,
-    'user': 'sail',
-    'password': 'password',
-    'database': 'laravel',
+    'host': '10.10.201.4',
+    'port': 3306,
+    'user': 'secofficer',
+    'password': 'laFarga$2k17',
+    'database': 'tms',
 }
 
 # ===============================

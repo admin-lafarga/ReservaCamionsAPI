@@ -34,6 +34,16 @@ Route::get('/', function (Request $request) {
         'ip' => $request->getClientIp(),
     ], 200);
 });
+//Ruta para probar la conexión de la bbdd
+Route::get('/db-test', function () {
+    try {
+        DB::connection()->getPdo();
+        return response()->json(['message' => 'Database connection is successful.'], 200);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Database connection failed: ' . $e->getMessage()], 500);
+    }
+});
+
 Route::get('test', function(){
     return 'exitos';
 })->middleware('auth:sanctum');
