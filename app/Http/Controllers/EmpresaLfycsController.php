@@ -59,17 +59,17 @@ class EmpresaLfycsController extends Controller
      */
     public function destroy(EmpresaLfycs $empresa)
     {
-        if ($empresa->muelles()->exists() || $empresa->reservas()->exists()) { {
+        if ($empresa->muelles()->exists() || $empresa->reservas()->exists()) {
                 return response()->json([
                     'message' => 'No se puede eliminar la empresa porque tiene muelles/reservas asociados.'
                 ], 400);
-            }
-
-            $empresa->delete();
-
-            return response()->json([
-                'message' => 'Empresa eliminado correctamente.'
-            ]);
         }
+
+        $empresa->delete();
+
+        return response()->json([
+            'message' => 'Empresa eliminado correctamente.'
+        ]);
+        
     }
 }

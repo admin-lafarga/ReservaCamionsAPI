@@ -70,7 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('file/name/{path}', [ReservaController::class, 'getPrivateFileName'])->where('path', '.*');
     Route::delete('file/name/{id}', [ReservaController::class, 'deletePrivateFile']);
     Route::get('/reservas/calendar', [ReservaController::class, 'indexCalendar']);
-    Route::apiResource('muelle/bloqueos', BloqueoMuelleController::class);
+    Route::apiResource('muelle/bloqueos', BloqueoMuelleController::class)->parameters(['bloqueos' => 'bloqueoMuelle']);
 
     Route::apiResource('users', UserController::class);
     Route::apiResource('proveedores', ProveedorController::class)->parameter('proveedores', 'proveedor');
@@ -88,6 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('muelles', MuelleController::class);
     Route::apiResource('reserva', ReservaController::class);
     Route::apiResource('permisos', PermisoController::class);
+    Route::get('bloqueo/grupos/material/{materialId}', [BloqueoGrupoMaterialController::class, 'getByMaterial']);
     Route::apiResource('bloqueo/grupos', BloqueoGrupoMaterialController::class);
     Route::apiResource('bloqueo/grupo/detalles', BloqueoGrupoMaterialDetalleController::class);
     Route::get('config/claves', [ParametroController::class, 'getParametrosByKeys']);
@@ -98,7 +99,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Esto es para obtener las columnas de una tabla dinámicamnete desde el frontend y hay que permitirlas para que no de error de sql injection
     Route::get('/columns/{table}', function ($table) {
-        $allowedTables = ['materiales', 'usuarios', 'proveedores','bloqueo/grupos','transportistas','empresas_lfycs','muelles','users','tipo_camiones','estados','reservas','horarios_muelles','tipo_proveedores', 'restricciones'];
+        $allowedTables = ['materiales', 'usuarios', 'proveedores','bloqueo/grupos','transportistas','empresas_lfycs','muelles','users','tipo_camiones','estados','reservas','horarios_muelles','tipo_proveedores', 'restricciones', 'bloqueo_muelles'];
         if (!in_array($table, $allowedTables)) {
             return response()->json(['error' => 'Taula no permesa'], 403);
         }
@@ -115,11 +116,17 @@ Route::middleware('auth:sanctum')->group(function () {
         }
     });
 
-    Route::post('/send-test', function () {
+    // Route::post('/send-test', function () {
+    //     $order = Reserva::first();
+    //     Mail::to('hassan.abbas@lafarga.es')->send(new ConfirmationMail($order));
+    //     return response()->json(['status' => 'ok', 'message' => 'Correo enviado']);
+    // });
+ });
+
+ Route::post('/send-test', function () {
         $order = Reserva::first();
         Mail::to('hassan.abbas@lafarga.es')->send(new ConfirmationMail($order));
         return response()->json(['status' => 'ok', 'message' => 'Correo enviado']);
     });
- });
 
  

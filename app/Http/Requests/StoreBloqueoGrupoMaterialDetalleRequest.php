@@ -11,7 +11,7 @@ class StoreBloqueoGrupoMaterialDetalleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,7 @@ class StoreBloqueoGrupoMaterialDetalleRequest extends FormRequest
     {
         return [
             'tipo_proveedor_id' => 'required|exists:proveedores,tipo_proveedor_id',
-            'usuario_id'        => 'required|exists:users,id',
+            // 'usuario_id'        => 'required|exists:users,id',
             'cantidad_total'    => 'required|integer|min:1',
             'cantidad_disponible' => 'required|integer|min:0|lte:cantidad_total',
             'fecha_desde'       => 'required|date',

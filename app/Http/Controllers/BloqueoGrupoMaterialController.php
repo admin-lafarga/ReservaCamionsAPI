@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBloqueoGrupoMaterialRequest;
 use App\Http\Requests\StoreBloqueoGrupoMaterialDetalleRequest;
+use App\Http\Requests\UpdateBloqueoGrupoMaterialRequest;
 use App\Models\BloqueoGrupoMaterial;
 use App\Models\BloqueoGrupoMaterialDetalle;
 
@@ -54,7 +55,7 @@ class BloqueoGrupoMaterialController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreBloqueoGrupoMaterialDetalleRequest $request, int $id)
+    public function update(UpdateBloqueoGrupoMaterialRequest $request, int $id)
     {
         $validated = $request->validated();
 
@@ -72,7 +73,7 @@ class BloqueoGrupoMaterialController extends Controller
 
         foreach ($validated['detalles'] as $detalle) {
             $BloqueoGrupoMaterialDetalle = [
-                'bloqueo_grupo_id' => $grupo->id,
+                'bloqueo_grupo_id' => $grupo->bloqueo_grupo_id,
                 'material_id' => $detalle['material_id'],
             ];
             BloqueoGrupoMaterialDetalle::create($BloqueoGrupoMaterialDetalle);
@@ -93,5 +94,21 @@ class BloqueoGrupoMaterialController extends Controller
 
 
         return response()->json(['message' => 'BloqueoGrupoMaterial i los detalles eliminados correctamente']);
+    }
+    /**
+     * Get material blockages by material_id for calendar display
+     */
+    public function getByMaterial(int $materialId)
+    {
+        $bloqueos = BloqueoGrupoMaterial::with([
+            'tipoproveedor:tipo_proveedor_id,nombre',
+            'detalles.material:material_id,nombre'
+        ])
+        ->whereHas('detalles', function($q) use ($materialId) {
+            $q->where('material_id', $materialId);
+        })
+        ->get();
+
+        return response()->json($bloqueos);
     }
 }

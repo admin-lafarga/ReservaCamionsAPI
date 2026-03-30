@@ -27,7 +27,7 @@ class StoreProveedorRequest extends FormRequest
             'codigo_sap' => 'nullable|string',
             'entidad' => 'required|array',
             'entidad.nombre' => 'required|string|max:255',
-            'entidad.abreviatura' => 'nullable|string|max:10',
+            'entidad.abreviatura' => 'nullable|string|max:255',
             'entidad.nif' => 'required|string|max:50',
             'entidad.pin' => 'required|string|max:255',
             'entidad.email' => 'required|email',

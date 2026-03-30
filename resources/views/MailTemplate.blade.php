@@ -22,11 +22,11 @@
       <!-- Datos en bloques -->
       <div style="display:flex;justify-content:space-between;align-items:center;background-color:#f9fafb;padding:10px 16px;border-radius:8px;margin-bottom:8px;">
         <span style="font-weight:500;color:#6b7280;">Hora Inicio</span>
-        <span style="color:#111827;">{{$reserva->inicio1}}</span>
+        <span style="color:#111827;">{{$reserva->inicio}}</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;background-color:#f9fafb;padding:10px 16px;border-radius:8px;margin-bottom:8px;">
         <span style="font-weight:500;color:#6b7280;">Hora Final</span>
-        <span style="color:#111827;">{{$reserva->fin1}}</span>
+        <span style="color:#111827;">{{$reserva->fin}}</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;background-color:#f9fafb;padding:10px 16px;border-radius:8px;margin-bottom:8px;">
         <span style="font-weight:500;color:#6b7280;">Cantidad</span>
@@ -41,13 +41,19 @@
         <span style="color:#111827;">{{$reserva->matricula_camion}}</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;background-color:#f9fafb;padding:10px 16px;border-radius:8px;margin-bottom:8px;">
-        <span style="font-weight:500;color:#6b7280;">Moll</span>
-        <span style="color:#111827;">{{$reserva->muelle1?->nombre}}</span>
+        <span style="font-weight:500;color:#6b7280;">Muelle</span>
+        <span style="color:#111827;">{{$reserva->muelle?->nombre}}</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;background-color:#f9fafb;padding:10px 16px;border-radius:8px;margin-bottom:8px;">
         <span style="font-weight:500;color:#6b7280;">Material</span>
-        <span style="color:#111827;">{{$reserva->material?->nombre}}</span>
+        <span style="color:#111827;">{{$reserva->material1?->nombre}}</span>
       </div>
+      @if($reserva->material2)
+      <div style="display:flex;justify-content:space-between;align-items:center;background-color:#f9fafb;padding:10px 16px;border-radius:8px;margin-bottom:8px;">
+        <span style="font-weight:500;color:#6b7280;">Material 2</span>
+        <span style="color:#111827;">{{$reserva->material2?->nombre}} ({{$reserva->cantidad2}})</span>
+      </div>
+      @endif
       <div style="display:flex;justify-content:space-between;align-items:center;background-color:#f9fafb;padding:10px 16px;border-radius:8px;margin-bottom:8px;">
         <span style="font-weight:500;color:#6b7280;">Notas</span>
         <span style="color:#111827;">{{$reserva->notas}}</span>
@@ -60,4 +66,6 @@
       </div>
     </div>
 
-    <!-- Foote
+  </div>
+</body>
+</html>

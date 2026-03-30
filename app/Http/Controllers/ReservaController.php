@@ -8,10 +8,16 @@ use App\Models\Reserva;
 use App\Models\DocumentosReserva;
 use App\Models\Proveedor;
 use App\Models\BloqueoGrupoMaterial;
+use App\Models\BloqueoMuelle;
 use App\Models\Entidad;
 use App\Models\Restriccion;
 use App\Models\Transportista;
 use Illuminate\Http\Request;
+use App\Models\HorarioMuelle;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ConfirmationMail;
 
 class ReservaController extends Controller
 {
@@ -27,6 +33,7 @@ class ReservaController extends Controller
         $relations = [
             'documentos',
             'proveedor.entidad',
+            'proveedor.tipoProveedor',
             'tipoCamion:tipo_camion_id,nombre',
             'material1:material_id,nombre',
             'material2:material_id,nombre',
@@ -51,8 +58,56 @@ class ReservaController extends Controller
             });
         }
 
-        // 3. Si no es Entidad, es User, el query sigue sin filtros y trae todo
-        return response()->json($query->get());
+        // 3. Aplicamos filtros de estado
+        $statusFilter = $request->input('status_filter', 'todas');
+        if ($statusFilter === 'pendientes') {
+            $query->where('inicio', '>=', now()->startOfDay());
+        } elseif ($statusFilter === 'antiguas') {
+            $query->where('inicio', '<', now()->startOfDay());
+        }
+
+        // 4. Búsqueda global (search)
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('reserva_id', 'like', "%{$search}%")
+                  ->orWhere('matricula_camion', 'like', "%{$search}%")
+                  ->orWhere('pedido1', 'like', "%{$search}%")
+                  ->orWhere('cantidad1', 'like', "%{$search}%")
+                  ->orWhereHas('proveedor.entidad', function ($pq) use ($search) {
+                      $pq->where('nombre', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('transportista.entidad', function ($tq) use ($search) {
+                      $tq->where('nombre', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('muelle', function ($mq) use ($search) {
+                      $mq->where('nombre', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('tipoCamion', function ($cq) use ($search) {
+                      $cq->where('nombre', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('material1', function ($matq) use ($search) {
+                      $matq->where('nombre', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // 5. Ordenamiento (Sort)
+        $sortField = $request->input('sort', 'inicio');
+        $sortDir = $request->input('dir', 'desc');
+        
+        // Mapeo seguro de columnas para no fallar con relaciones
+        $allowedSorts = ['reserva_id', 'inicio', 'fin', 'matricula_camion', 'pedido1', 'cantidad1'];
+        if (in_array($sortField, $allowedSorts)) {
+            $query->orderBy($sortField, $sortDir === 'asc' ? 'asc' : 'desc');
+        } else {
+            $query->orderBy('inicio', 'desc');
+        }
+
+        // 6. Finalmente, paginamos (por defecto 10 por página)
+        $perPage = $request->input('per_page', 10);
+        
+        // return response()->json($query->paginate($perPage));
+        return response()->json($query->paginate($perPage));
     }
 
     // Llistat de reserves Calendari
@@ -93,8 +148,9 @@ class ReservaController extends Controller
 
         $reservas = Reserva::with([
             'documentos',
-            'proveedor:proveedor_id,entidad_id',
+            'proveedor:proveedor_id,entidad_id,tipo_proveedor_id',
             'proveedor.entidad:entidad_id,nombre',
+            'proveedor.tipoProveedor',
             'tipoCamion:tipo_camion_id,nombre',
             'material1:material_id,nombre',
             'material2:material_id,nombre',
@@ -118,6 +174,36 @@ class ReservaController extends Controller
     public function store(StoreReservaRequest $request)
     {
         $validatedData = $request->validated();
+
+        // 0️⃣ Validar horario operativo del muelle
+        $fechaInicio = Carbon::parse($validatedData['inicio']);
+        $fechaFin = Carbon::parse($validatedData['fin']);
+        
+        // Obtener día de la semana (1 = Lunes, 7 = Domingo)
+        $diaSemana = $fechaInicio->dayOfWeekIso;
+
+        $horario = HorarioMuelle::where('muelle_id', $validatedData['muelle_id'])
+            ->where('dia_semana', $diaSemana)
+            ->first();
+
+        if (!$horario) {
+            return response()->json([
+                'id' => 3,
+                'message' => 'El muelle seleccionado no está operativo este día de la semana.',
+                'muelle_id' => $validatedData['muelle_id']
+            ], 422);
+        }
+
+        $horaInicioReserva = $fechaInicio->format('H:i:s');
+        $horaFinReserva = $fechaFin->format('H:i:s');
+
+        if ($horaInicioReserva < $horario->inicio || $horaFinReserva > $horario->fin) {
+            return response()->json([
+                'id' => 4,
+                'message' => "La reserva está fuera del horario operativo ({$horario->inicio} - {$horario->fin}).",
+                'muelle_id' => $validatedData['muelle_id']
+            ], 422);
+        }
 
         // 1️⃣ Validar conflictos de tiempo con otras reservas del mismo muelle
         $conflictos = Reserva::where('muelle_id', $validatedData['muelle_id'])
@@ -149,7 +235,25 @@ class ReservaController extends Controller
             }
         }
 
-        // 2️⃣ Validar disponibilidad de materiales en bloqueos de grupo
+        // 2️⃣ Validar que el muelle no esté bloqueado (específico o global)
+        $bloqueoMuelle = BloqueoMuelle::where(function($q) use ($validatedData) {
+                $q->where('muelle_id', $validatedData['muelle_id'])
+                  ->orWhereNull('muelle_id'); // Verificar bloqueos globales
+            })
+            ->where('inicio', '<', $validatedData['fin'])
+            ->where('fin', '>', $validatedData['inicio'])
+            ->first();
+
+        if ($bloqueoMuelle) {
+            return response()->json([
+                'id' => 2,
+                'message' => 'No es posible reservar este muelle en estas fechas',
+                'bloqueo_muelle_id' => $bloqueoMuelle->bloqueo_muelle_id,
+                'asunto' => $bloqueoMuelle->asunto,
+            ], 422);
+        }
+
+        // 3️⃣ Validar disponibilidad de materiales en bloqueos de grupo
 
         // Obtener proveedor y tipo
         $provider = Proveedor::find($validatedData['proveedor_id']);
@@ -190,7 +294,7 @@ class ReservaController extends Controller
 
                 return response()->json([
                     'id' => 1,
-                    'message' => 'No hay suficiente material disponible en el bloqueo de grupo.',
+                    'message' => 'No se puede reservar este material en estas fechas',
                     'grupo_bloqueo_id' => $bloqueoId,
                     'material' => $materialNombre,
                 ], 422);
@@ -240,6 +344,21 @@ class ReservaController extends Controller
                     'name' => $nombreOriginal
                 ]);
             }
+        }
+
+        // 6️⃣ Enviar email de confirmación
+        try {
+            $reserva->load(['tipoCamion', 'material1', 'material2', 'muelle']);
+            Mail::to('hassan.abbas@lafarga.es')->send(new ConfirmationMail($reserva));
+            return response()->json([
+                'message' => 'Email de confirmación enviado para reserva #' . $reserva->reserva_id,
+            ], 200);
+            // Log::info('Email de confirmación enviado para reserva #' . $reserva->reserva_id);
+        } catch (\Exception $e) {
+            // Log::error('Error enviando email de confirmación: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error enviando email de confirmación: ' . $e->getMessage(),
+            ], 500);
         }
 
         return response()->json([

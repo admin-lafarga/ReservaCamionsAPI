@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id('bloqueo_muelle_id');
             $table->unsignedBigInteger('muelle_id');
             $table->text('asunto');
-            $table->timestamp('inicio');
-            $table->timestamp('fin')->nullable();
+            $table->dateTime('inicio');
+            $table->dateTime('fin')->nullable();
 
             $table->foreign('muelle_id')->references('muelle_id')->on('muelles')->onDelete('cascade');
 

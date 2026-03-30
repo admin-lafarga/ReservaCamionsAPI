@@ -1,6 +1,13 @@
 import mysql.connector
 import bcrypt
+import hashlib
 from datetime import datetime, timedelta
+
+# ===============================
+#EJECUTAR SCRIPT
+# ===============================
+# source venv/bin/activate
+
 
 # ===============================
 # CONFIGURACIÓN DE CONEXIONES
@@ -21,6 +28,13 @@ NEW_DB = {
     'database': 'laravel',
 }
 
+# NEW_DB = {
+#     'host': '10.10.201.4',
+#     'port': 3306,
+#     'user': 'secofficer',
+#     'password': 'laFarga$2k17',
+#     'database': 'tms',
+# }
 # ===============================
 # MAPPINGS
 # ===============================
@@ -452,7 +466,8 @@ def migrar_entidades(old_cur, new_cur, tipo_proveedor_map):
             None
         ))
 
-        transportista_map[old_id] = entidad_id
+        transportista_id = new_cur.lastrowid
+        transportista_map[old_id] = transportista_id
 
     print("   Entidades migradas correctamente.")
     return proveedor_map, transportista_map
@@ -557,6 +572,226 @@ def migrar_usuarios(old_cur, new_cur, rol_map):
     print(f"   ✓ {count} usuarios migrados.")
 
 
+def migrar_restricciones(old_cur, new_cur, muelle_map):
+    """
+    Migra restricciones desde la BD antigua a la nueva.
+    Tabla antigua: restricciones (Id_rest, id_moll1, id_moll2)
+    Tabla nueva:   restricciones (restriccion_id, muelle_id, muelle_restringido_id)
+    """
+    print("→ Migrando restricciones...")
+
+    old_cur.execute("SELECT Id_rest, id_moll1, id_moll2 FROM restricciones")
+    rows = old_cur.fetchall()
+
+    count = 0
+    skipped = 0
+
+    for id_rest, id_moll1, id_moll2 in rows:
+        muelle_id = muelle_map.get(id_moll1)
+        muelle_restringido_id = muelle_map.get(id_moll2)
+
+        if not muelle_id:
+            print(f"⚠️ Muelle origen ID {id_moll1} no migrado. Se omite restricción {id_rest}.")
+            skipped += 1
+            continue
+        if not muelle_restringido_id:
+            print(f"⚠️ Muelle restringido ID {id_moll2} no migrado. Se omite restricción {id_rest}.")
+            skipped += 1
+            continue
+
+        try:
+            new_cur.execute("""
+                INSERT INTO restricciones (muelle_id, muelle_restringido_id, created_at, updated_at)
+                VALUES (%s, %s, NOW(), NOW())
+            """, (muelle_id, muelle_restringido_id))
+            count += 1
+        except Exception as e:
+            print(f"⚠️ Error insertando restricción {id_rest}: {e}")
+            skipped += 1
+
+    print(f"   ✓ {count} restricciones migradas. {skipped} omitidas.")
+
+
+def migrar_bloqueos_grupo_material(old_cur, new_cur, material_map, tipo_proveedor_map):
+    """
+    Migra bloqueos de grupo de materiales.
+    Tabla antigua: rm_bloqueix_kg_material
+      (Idbloquekgmaterial, ID_Material, Quantitat, Data_Inici, Data_Fi, ID_Usuari, Created_at, ID_tipus_proveidor)
+    Tablas nuevas:
+      bloqueo_grupo_materiales  (bloqueo_grupo_id, tipo_proveedor_id, cantidad_total, cantidad_disponible, inicio, fin)
+      bloqueo_grupo_material_detalles (bloqueo_grupo_detalle_id, bloqueo_grupo_id, material_id)
+    """
+    print("→ Migrando bloqueos de grupo de materiales...")
+
+    old_cur.execute("""
+        SELECT Idbloquekgmaterial, ID_Material, Quantitat, Data_Inici, Data_Fi,
+               Created_at, ID_tipus_proveidor
+        FROM rm_bloqueix_kg_material
+    """)
+    rows = old_cur.fetchall()
+
+    count_grupos = 0
+    count_detalles = 0
+    skipped = 0
+
+    for id_bloq, id_material, quantitat, data_inici, data_fi, created_at, id_tipus_prov in rows:
+        material_id = material_map.get(id_material)
+        tipo_proveedor_id = tipo_proveedor_map.get(id_tipus_prov)
+
+        if not material_id:
+            print(f"⚠️ Material ID {id_material} no migrado. Se omite bloqueo {id_bloq}.")
+            skipped += 1
+            continue
+        if not tipo_proveedor_id:
+            print(f"⚠️ Tipo proveedor ID {id_tipus_prov} no migrado. Se omite bloqueo {id_bloq}.")
+            skipped += 1
+            continue
+
+        try:
+            # Insertar el grupo de bloqueo
+            new_cur.execute("""
+                INSERT INTO bloqueo_grupo_materiales
+                (tipo_proveedor_id, cantidad_total, cantidad_disponible, inicio, fin, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (
+                tipo_proveedor_id,
+                int(quantitat) if quantitat is not None else 0,
+                int(quantitat) if quantitat is not None else 0,  # disponible = total al migrar
+                data_inici,
+                data_fi,
+                created_at,
+                created_at
+            ))
+            bloqueo_grupo_id = new_cur.lastrowid
+            count_grupos += 1
+
+            # Insertar el detalle (material asociado)
+            new_cur.execute("""
+                INSERT INTO bloqueo_grupo_material_detalles
+                (bloqueo_grupo_id, material_id, created_at, updated_at)
+                VALUES (%s, %s, %s, %s)
+            """, (bloqueo_grupo_id, material_id, created_at, created_at))
+            count_detalles += 1
+
+        except Exception as e:
+            print(f"❌ Error insertando bloqueo {id_bloq}: {e}")
+            skipped += 1
+
+    print(f"   ✓ {count_grupos} bloqueos de grupo y {count_detalles} detalles migrados. {skipped} omitidos.")
+
+
+def migrar_reservas(old_cur, new_cur, empresa_map, proveedor_map, transportista_map,
+                    muelle_map, material_map, tipo_camion_map, estado_map):
+    """
+    Migra reservas desde rm_reserva a la tabla reservas.
+    NOTA: La BD antigua tiene dos slots de material/muelle (0 y 1).
+          El esquema nuevo tiene muelle_id único (se usa ID_Moll0) y material2_id opcional.
+          Las reservas con segundo muelle distinto (ID_Moll1 != ID_Moll0) se migran
+          con el muelle principal (ID_Moll0), registrando un aviso.
+    """
+    print("→ Migrando reservas...")
+
+    old_cur.execute("""
+        SELECT
+            ID_Reserva,
+            ID_Empresa,
+            ID_TipusCamio0,
+            ID_Material0,
+            ID_Material1,
+            Quantitat0,
+            Quantitat1,
+            Comanda_LF,
+            Comanda_LF_1,
+            ID_Proveidor,
+            ID_Transport,
+            Camio_Matricula0,
+            Hora_Inici0,
+            Hora_Final0,
+            duration0,
+            ID_Moll0,
+            ID_Status,
+            Es_Aduana,
+            Notes,
+            Tel1,
+            created_at
+        FROM rm_reserva
+    """)
+    rows = old_cur.fetchall()
+    print(f"   → {len(rows)} reservas encontradas en BD antigua")
+
+    count = 0
+    skipped = 0
+
+    for row in rows:
+        (
+            ID_Reserva, ID_Empresa, ID_TipusCamio0, ID_Material0, ID_Material1,
+            Quantitat0, Quantitat1, Comanda_LF, Comanda_LF_1,
+            ID_Proveidor, ID_Transport, Camio_Matricula0,
+            Hora_Inici0, Hora_Final0, duration0, ID_Moll0,
+            ID_Status, Es_Aduana, Notes, Tel1, created_at
+        ) = row
+
+        # Resolver FKs
+        empresa_id       = empresa_map.get(ID_Empresa)
+        tipo_camion_id   = tipo_camion_map.get(ID_TipusCamio0)
+        material1_id     = material_map.get(ID_Material0)
+        material2_id     = material_map.get(ID_Material1) if ID_Material1 else None
+        proveedor_id     = proveedor_map.get(ID_Proveidor)
+        # ID_Transport = -1 significa sin transportista asignado en BD antigua → omitir
+        transportista_id = transportista_map.get(ID_Transport) if (ID_Transport and ID_Transport > 0) else None
+        muelle_id        = muelle_map.get(ID_Moll0)
+        estado_id        = estado_map.get(ID_Status, 1)
+
+        # Validar FKs obligatorios
+        # transportista_id es nullable: si no hay transportista se migra con NULL
+        missing = []
+        if not empresa_id:      missing.append(f"empresa({ID_Empresa})")
+        if not tipo_camion_id:  missing.append(f"tipo_camion({ID_TipusCamio0})")
+        if not material1_id:    missing.append(f"material1({ID_Material0})")
+        if not proveedor_id:    missing.append(f"proveedor({ID_Proveidor})")
+        if not muelle_id:       missing.append(f"muelle({ID_Moll0})")
+
+        if missing:
+            print(f"⚠️ Reserva {ID_Reserva} omitida. FKs no encontradas: {', '.join(missing)}")
+            skipped += 1
+            continue
+
+        # Valores por defecto seguros
+        duracion     = int(duration0) if duration0 is not None else 30
+        cantidad1    = int(Quantitat0) if Quantitat0 is not None else 0
+        cantidad2    = int(Quantitat1) if Quantitat1 is not None else None
+        pedido1      = Comanda_LF or ''
+        pedido2      = Comanda_LF_1 or None
+        matricula    = Camio_Matricula0 or ''
+        aduana       = bool(Es_Aduana)
+        notas        = Notes or None
+        telefono     = Tel1 or None
+
+        try:
+            new_cur.execute("""
+                INSERT INTO reservas
+                (reserva_id, empresa_lfycs_id, tipo_camion_id, material1_id, material2_id,
+                 proveedor_id, transportista_id, muelle_id, estado_id,
+                 cantidad1, cantidad2, pedido1, pedido2,
+                 matricula_camion, inicio, fin, duracion,
+                 telefono, aduana, notas, created_at, updated_at)
+                VALUES (%s, %s,%s,%s,%s, %s,%s,%s,%s, %s,%s,%s,%s, %s,%s,%s,%s, %s,%s,%s,%s,%s)
+            """, (
+                ID_Reserva, empresa_id, tipo_camion_id, material1_id, material2_id,
+                proveedor_id, transportista_id, muelle_id, estado_id,
+                cantidad1, cantidad2, pedido1, pedido2,
+                matricula, Hora_Inici0, Hora_Final0, duracion,
+                telefono, aduana, notas, created_at, created_at
+            ))
+            count += 1
+
+        except Exception as e:
+            print(f"❌ Error insertando reserva {ID_Reserva}: {e}")
+            skipped += 1
+
+    print(f"   ✓ {count} reservas migradas. {skipped} omitidas.")
+
+
 # ===============================
 # SCRIPT PRINCIPAL
 # ===============================
@@ -580,10 +815,9 @@ def main():
 
         # -----------------------
         # TIPO CAMIONES
+        # Nota: migrar_tipo_camiones devuelve {old_id: new_id}
         # -----------------------
-        migrar_tipo_camiones(old_cur, new_cur)
-        new_cur.execute("SELECT tipo_camion_id, nombre FROM tipo_camiones")
-        tipo_camion_map = {row[0]: row[0] for row in new_cur.fetchall()}
+        tipo_camion_map = migrar_tipo_camiones(old_cur, new_cur)
 
         # -----------------------
         # MATERIALES
@@ -615,11 +849,32 @@ def main():
         # USUARIOS
         # -----------------------
         migrar_usuarios(old_cur, new_cur, rol_map)
-        
+
         # -----------------------
-        # RESERVAS (PRÓXIMOS 7 DÍAS)
+        # RESTRICCIONES DE MUELLES
         # -----------------------
-        # migrar_reservas(old_cur, new_cur, empresa_map, proveedor_map, transportista_map, muelle_map, material_map, tipo_camion_map)
+        migrar_restricciones(old_cur, new_cur, muelle_map)
+
+        # -----------------------
+        # BLOQUEOS DE GRUPO DE MATERIALES
+        # -----------------------
+        migrar_bloqueos_grupo_material(old_cur, new_cur, material_map, tipo_proveedor_map)
+
+        # -----------------------
+        # RESERVAS
+        # Construir estado_map desde la nueva BD (ya migrados los estados)
+        # -----------------------
+        new_cur.execute("SELECT estado_id FROM estados ORDER BY estado_id")
+        estado_ids = [r[0] for r in new_cur.fetchall()]
+        old_cur.execute("SELECT ID_Status FROM rm_status ORDER BY ID_Status")
+        old_estado_ids = [r[0] for r in old_cur.fetchall()]
+        estado_map = dict(zip(old_estado_ids, estado_ids))
+
+        migrar_reservas(
+            old_cur, new_cur,
+            empresa_map, proveedor_map, transportista_map,
+            muelle_map, material_map, tipo_camion_map, estado_map
+        )
 
         new_conn.commit()
         print("\n✅ Migración completada con éxito.")
@@ -627,6 +882,8 @@ def main():
     except Exception as e:
         new_conn.rollback()
         print("\n❌ Error durante la migración:", e)
+        import traceback
+        traceback.print_exc()
     finally:
         old_cur.close()
         new_cur.close()

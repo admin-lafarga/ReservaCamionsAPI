@@ -29,7 +29,7 @@ class UpdateTransportistaRequest extends FormRequest
             // 🔹 Reglas de la entidad asociada
             'entidad' => 'required|array',
             'entidad.nombre' => 'required|string|max:255',
-            'entidad.abreviatura' => 'nullable|string|max:10',
+            'entidad.abreviatura' => 'nullable|string|max:255',
             'entidad.nif' => 'required|string|max:50|unique:entidades,nif,' . $entidadId . ',entidad_id',
             'entidad.pin' => 'required|string|max:255',
             'entidad.email' => 'required|email|unique:entidades,email,' . $entidadId . ',entidad_id',
