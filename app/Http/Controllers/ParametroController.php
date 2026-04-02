@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 
 class ParametroController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Parametro::class, 'config');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -58,6 +63,8 @@ class ParametroController extends Controller
      * Get multiple parameters by keys
      */
     public function getParametrosByKeys(Request $request) {
+        $this->authorize('viewAny', Parametro::class);
+
         $keys = (array) $request->input('keys', []);
 
         $parametros = Parametro::whereIn('clave', $keys)
@@ -70,6 +77,8 @@ class ParametroController extends Controller
      * Store multiple parameters by keys
      */
     public function storeParametrosByKeys(Request $request) {
+        $this->authorize('update', new Parametro());
+
         $data = $request->all();
         foreach ($data as $key => $value) {
             Parametro::updateOrCreate(

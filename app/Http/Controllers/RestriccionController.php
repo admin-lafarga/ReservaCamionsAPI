@@ -8,6 +8,11 @@ use App\Models\Restriccion;
 
 class RestriccionController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Restriccion::class, 'restriccion');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -67,6 +72,8 @@ class RestriccionController extends Controller
 
     public function bulkDelete(StoreRestriccionRequest $request)
     {
+        $this->authorize('delete', new Restriccion());
+
         foreach ($request->all() as $item) {
             Restriccion::where('muelle_id', $item['muelle_id'])
                 ->where('muelle_restringido_id', $item['muelle_restringido_id'])

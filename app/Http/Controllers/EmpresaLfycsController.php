@@ -8,6 +8,11 @@ use App\Models\EmpresaLfycs;
 
 class EmpresaLfycsController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(EmpresaLfycs::class, 'empresa');
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -8,6 +8,11 @@ use App\Models\Muelle;
 
 class MuelleController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Muelle::class, 'muelle');
+    }
+
     /**
      * Display a listing of the resource.
      */

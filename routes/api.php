@@ -42,7 +42,7 @@ Route::get('/db-test', function () {
     } catch (\Exception $e) {
         return response()->json(['message' => 'Database connection failed: ' . $e->getMessage()], 500);
     }
-});
+})->middleware('auth:sanctum');
 
 Route::get('test', function(){
     return 'exitos';
@@ -52,15 +52,10 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('login', [AuthController::class, 'login'])->middleware('guest');
-Route::post('/logout', [AuthController::class, 'logout']);
-
+Route::post('login', [AuthController::class, 'login'])->middleware('guest')->name('login');
 Route::get('/authenticated', [AuthController::class, 'authenticated']);
 
-// TERMPORALMENT #############################################
-Route::post('/register', [AuthController::class, 'register']);
-// ###########################################################
-// 'auth:sanctum'
+
 Route::middleware('auth:sanctum')->group(function () {
     // LOGOUT
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -114,19 +109,8 @@ Route::middleware('auth:sanctum')->group(function () {
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error carregant columnes: ' . $e->getMessage()], 500);
         }
-    });
-
-    // Route::post('/send-test', function () {
-    //     $order = Reserva::first();
-    //     Mail::to('hassan.abbas@lafarga.es')->send(new ConfirmationMail($order));
-    //     return response()->json(['status' => 'ok', 'message' => 'Correo enviado']);
-    // });
+    });   
  });
 
- Route::post('/send-test', function () {
-        $order = Reserva::first();
-        Mail::to('hassan.abbas@lafarga.es')->send(new ConfirmationMail($order));
-        return response()->json(['status' => 'ok', 'message' => 'Correo enviado']);
-    });
 
  

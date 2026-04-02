@@ -8,6 +8,11 @@ use App\Models\HorarioMuelle;
 
 class HorarioMuelleController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(HorarioMuelle::class, 'horario');
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -8,6 +8,11 @@ use App\Models\Estado;
 
 class EstadoController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Estado::class, 'status');
+    }
+
     /**
      * Display a listing of the resource.
      */

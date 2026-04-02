@@ -10,6 +10,11 @@ use App\Models\BloqueoGrupoMaterialDetalle;
 
 class BloqueoGrupoMaterialController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(BloqueoGrupoMaterial::class, 'grupo');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -100,6 +105,8 @@ class BloqueoGrupoMaterialController extends Controller
      */
     public function getByMaterial(int $materialId)
     {
+        $this->authorize('viewAny', BloqueoGrupoMaterial::class);
+
         $bloqueos = BloqueoGrupoMaterial::with([
             'tipoproveedor:tipo_proveedor_id,nombre',
             'detalles.material:material_id,nombre'

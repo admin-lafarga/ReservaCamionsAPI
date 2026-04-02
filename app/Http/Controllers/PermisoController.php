@@ -8,6 +8,11 @@ use App\Models\Permiso;
 
 class PermisoController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Permiso::class, 'permiso');
+    }
+
     /**
      * Display a listing of the resource.
      */

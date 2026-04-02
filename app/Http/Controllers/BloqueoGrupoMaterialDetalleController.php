@@ -8,6 +8,11 @@ use App\Models\BloqueoGrupoMaterialDetalle;
 
 class BloqueoGrupoMaterialDetalleController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(BloqueoGrupoMaterialDetalle::class, 'detalle');
+    }
+
     /**
      * Display a listing of the resource.
      */

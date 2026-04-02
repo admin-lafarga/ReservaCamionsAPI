@@ -21,6 +21,11 @@ use App\Mail\ConfirmationMail;
 
 class ReservaController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Reserva::class, 'reserva');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -113,7 +118,8 @@ class ReservaController extends Controller
     // Llistat de reserves Calendari
     public function indexCalendar(Request $request)
     {
-                $user = $request->user();
+        $this->authorize('viewAny', Reserva::class);
+        $user = $request->user();
         
         // 1. Preparamos la query base cargando la relación del muelle (necesaria para el color en el front)
         $query = Reserva::with('muelle'); 
@@ -552,6 +558,8 @@ class ReservaController extends Controller
     // Retornar els fitxers associats a la reserva
     public function getPrivateFile($path)
     {
+        $this->authorize('viewAny', Reserva::class);
+
         $fullPath = storage_path('app/private/' . $path);
         $realBase = realpath(storage_path('app/private'));
         $realFullPath = realpath($fullPath);
@@ -581,6 +589,8 @@ class ReservaController extends Controller
     // Funció per retornar el nom del fitxer
     public function getPrivateFileName($path)
     {
+        $this->authorize('viewAny', Reserva::class);
+
         $document = DocumentosReserva::where('url', $path)->first();
         if (!$document) {
             return response("Document no trobat a la base de dades", 404);
@@ -597,6 +607,8 @@ class ReservaController extends Controller
     // Funció per eliminar un fitxer privat
     public function deletePrivateFile($id)
     {
+        $this->authorize('delete', new Reserva());
+
         $booking_document = DocumentosReserva::findOrFail($id);
 
         $filePath = storage_path('app/private/' . $booking_document->url);
@@ -620,6 +632,8 @@ class ReservaController extends Controller
      **/
     public function generateReport(Request $request)
     {
+        $this->authorize('create', Reserva::class); // Solo usuarios internos pueden descargar informes
+
         $request->validate([
             'from' => 'required|date',
             'to' => 'required|date|after_or_equal:from',

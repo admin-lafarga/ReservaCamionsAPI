@@ -10,6 +10,11 @@ use App\Models\Reserva;
 
 class BloqueoMuelleController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(BloqueoMuelle::class, 'bloqueoMuelle');
+    }
+
     /**
      * Display a listing of the resource.
      */

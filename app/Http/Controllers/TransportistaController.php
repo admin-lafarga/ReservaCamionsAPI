@@ -12,6 +12,11 @@ use Carbon\Carbon;
 
 class TransportistaController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Transportista::class, 'transportista');
+    }
+
     /**
      * Display a listing of the resource.
      */

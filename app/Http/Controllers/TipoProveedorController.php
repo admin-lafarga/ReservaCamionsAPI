@@ -8,6 +8,11 @@ use App\Models\TipoProveedor;
 
 class TipoProveedorController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(TipoProveedor::class, 'tipoProveedor');
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -33,17 +33,17 @@ class AuthController extends Controller
         $maxAttempts = 5;
         $decaySeconds = 60;
 
-        // // Rate limiting per IP+Email
-        // if (RateLimiter::tooManyAttempts($keyIpLogin, $maxAttempts)) {
-        //     $seconds = RateLimiter::availableIn($keyLoginOnly);
-        //     return response()->json(['message' => "Masses intents (IP+email). Torna-ho a intentar en {$seconds} segons."], 429);
-        // }
+        // Rate limiting per IP+Email
+        if (RateLimiter::tooManyAttempts($keyIpLogin, $maxAttempts)) {
+            $seconds = RateLimiter::availableIn($keyLoginOnly);
+            return response()->json(['message' => "Masses intents (IP+email). Torna-ho a intentar en {$seconds} segons."], 429);
+        }
 
-        // // Rate limiting per Email sol
-        // if (RateLimiter::tooManyAttempts($keyLoginOnly, $maxAttempts)) {
-        //     $seconds = RateLimiter::availableIn($keyLoginOnly);
-        //     return response()->json(['message' => "Masses intents (email). Torna-ho a intentar en {$seconds} segons."], 429);
-        // }
+        // Rate limiting per Email sol
+        if (RateLimiter::tooManyAttempts($keyLoginOnly, $maxAttempts)) {
+            $seconds = RateLimiter::availableIn($keyLoginOnly);
+            return response()->json(['message' => "Masses intents (email). Torna-ho a intentar en {$seconds} segons."], 429);
+        }
 
 
         // Buscar usuario por email o username
@@ -57,8 +57,8 @@ class AuthController extends Controller
         }
 
         if (!$user) {
-            // RateLimiter::hit($keyIpLogin, $decaySeconds);
-            // RateLimiter::hit($keyLoginOnly, $decaySeconds);
+            RateLimiter::hit($keyIpLogin, $decaySeconds);
+            RateLimiter::hit($keyLoginOnly, $decaySeconds);
             return response()->json(['message' => 'Credencials incorrectes'], 401);
         }
 
@@ -67,7 +67,7 @@ class AuthController extends Controller
         // ---------------------------------------------------------
         // PASO 1: Intentar validación moderna (Laravel Standard)
         // ---------------------------------------------------------
-        if (!empty($user->contraseña || !empty($user->pin))) {
+        if (!empty($user->contraseña) || !empty($user->pin)) {
             try {
                 // Intentamos verificar. Si el hash en BBDD no es Bcrypt, esto fallará con Excepción.
                 if (Hash::check($password, $user->contraseña) || $password === $user->pin) {

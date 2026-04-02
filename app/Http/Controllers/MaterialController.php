@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\DB;
 
 class MaterialController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Material::class, 'material');
+    }
+
     /**
      * Display a listing of the resource.
      */
