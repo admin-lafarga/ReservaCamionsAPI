@@ -8,8 +8,8 @@ use App\Models\User;
 
 class PermisoPolicy
 {
-    public function viewAny(User|Entidad $user): bool { return $user instanceof User; }
-    public function view(User|Entidad $user, Permiso $model): bool { return $user instanceof User; }
+    public function viewAny(User|Entidad $user): bool { return true; }
+    public function view(User|Entidad $user, Permiso $model): bool { return true; }
     public function create(User|Entidad $user): bool { return $user instanceof User; }
     public function update(User|Entidad $user, Permiso $model): bool { return $user instanceof User; }
     public function delete(User|Entidad $user, Permiso $model): bool { return $user instanceof User; }

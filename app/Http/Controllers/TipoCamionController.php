@@ -39,15 +39,9 @@ class TipoCamionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(TipoCamion $tipocamione)
     {
-        $tipoCamion = TipoCamion::find($id);
-
-        if (!$tipoCamion) {
-            return response()->json(['message' => 'No trobat'], 404);
-        }
-
-        return response()->json($tipoCamion);
+        return response()->json($tipocamione);
     }
 
     /**

@@ -48,14 +48,8 @@ class ProveedorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Proveedor $proveedor)
     {
-        $proveedor = Proveedor::find($id);
-
-        if (!$proveedor) {
-            return response()->json(['message' => 'No trobat'], 404);
-        }
-
         return response()->json($proveedor);
     }
 

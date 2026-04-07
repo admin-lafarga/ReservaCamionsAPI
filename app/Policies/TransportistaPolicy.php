@@ -13,12 +13,12 @@ class TransportistaPolicy
 {
     public function viewAny(User|Entidad $user): bool
     {
-        return $user instanceof User;
+        return true;
     }
 
     public function view(User|Entidad $user, Transportista $transportista): bool
     {
-        return $user instanceof User;
+        return true;
     }
 
     public function create(User|Entidad $user): bool

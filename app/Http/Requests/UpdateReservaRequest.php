@@ -24,9 +24,9 @@ class UpdateReservaRequest extends FormRequest
         return [
             'tipo_camion_id'      => ['required', 'integer', 'exists:tipo_camiones,tipo_camion_id'],
             'material1_id'   => ['required', 'integer', 'exists:materiales,material_id'],
-            'material2_id'   => ['nullable', 'integer', 'exists:materiales,material_id', 'different:tipo_material1_id'],
+            'material2_id'   => ['nullable', 'integer', 'exists:materiales,material_id', 'different:material1_id'],
             'proveedor_id'        => ['required', 'integer', 'exists:proveedores,proveedor_id'],
-            'transportista_id'       => ['required', 'integer', 'exists:transportistas,transportista_id'],
+            'transportista_id'       => ['nullable', 'integer', 'exists:transportistas,transportista_id'],
             'muelle_id'          => ['required', 'integer', 'exists:muelles,muelle_id'],
             'estado_id'           => ['required', 'integer', 'exists:estados,estado_id'],
             'cantidad1'           => ['required', 'numeric', 'min:0'],

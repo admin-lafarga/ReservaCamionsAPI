@@ -32,6 +32,6 @@ class TipoCamion extends Model
     }
 
     public function materiales(){
-        return $this->belongsToMany(Material::class, 'material_tipo_camion', 'tipo_camion_id', 'material_id');
+        return $this->belongsToMany(Material::class, 'material_tipo_camiones', 'tipo_camion_id', 'material_id');
     }
 }

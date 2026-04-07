@@ -1,7 +1,6 @@
 import mysql.connector
 import bcrypt
 import hashlib
-import os
 from datetime import datetime, timedelta
 
 # ===============================
@@ -21,21 +20,21 @@ OLD_DB = {
     'database': 'larfarga_recepciomercaderies',
 }
 
-# NEW_DB = {
-#     'host': 'localhost',
-#     'port': 3307,
-#     'user': 'sail',
-#     'password': 'password',
-#     'database': 'laravel',
-# }
-
 NEW_DB = {
-    'host': '10.10.201.4',
-    'port': 3306,
-    'user': 'secofficer',
-    'password': 'laFarga$2k17',
-    'database': 'tms',
+    'host': 'localhost',
+    'port': 3307,
+    'user': 'sail',
+    'password': 'password',
+    'database': 'laravel',
 }
+
+# NEW_DB = {
+#     'host': '10.10.201.4',
+#     'port': 3306,
+#     'user': 'secofficer',
+#     'password': 'laFarga$2k17',
+#     'database': 'tms',
+# }
 # ===============================
 # MAPPINGS
 # ===============================
@@ -793,68 +792,6 @@ def migrar_reservas(old_cur, new_cur, empresa_map, proveedor_map, transportista_
     print(f"   ✓ {count} reservas migradas. {skipped} omitidas.")
 
 
-def migrar_documentos(old_cur, new_cur):
-    """
-    Migra documentos desde la tabla uploads hacia el sistema de archivos de Laravel.
-    Los documentos se guardan como archivos físicos y se registran en documentos_reserva.
-    """
-    print("→ Migrando documentos de reservas...")
-
-    # Directorio base de almacenamiento en Laravel
-    # Se asume que el script se ejecuta en un entorno donde se puede acceder a la carpeta storage/
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    base_path = os.path.join(current_dir, "..", "storage", "app", "private", "reservas")
-    
-    if not os.path.exists(base_path):
-        os.makedirs(base_path, exist_ok=True)
-
-    old_cur.execute("""
-        SELECT id_upload, name, data, ID_Reserva 
-        FROM uploads 
-        WHERE ID_Reserva IS NOT NULL AND ID_Reserva > 0
-    """)
-    docs = old_cur.fetchall()
-    print(f"   → {len(docs)} documentos encontrados en sistema antiguo")
-
-    count = 0
-    skipped = 0
-
-    for id_upload, name, data, id_reserva_old in docs:
-        # Verificar si la reserva existe en la nueva base de datos
-        new_cur.execute("SELECT reserva_id FROM reservas WHERE reserva_id = %s", (id_reserva_old,))
-        if not new_cur.fetchone():
-            skipped += 1
-            continue
-
-        try:
-            # Crear carpeta para la reserva
-            reserva_dir = os.path.join(base_path, str(id_reserva_old))
-            os.makedirs(reserva_dir, exist_ok=True)
-
-            # Nombre de archivo seguro (evitar colisiones de nombres iguales en la misma reserva)
-            ext = os.path.splitext(name)[1] or ".pdf"
-            sanitized_name = f"doc_{id_upload}{ext}"
-            file_path = os.path.join(reserva_dir, sanitized_name)
-
-            # Exportar BLOB a archivo físico
-            with open(file_path, "wb") as f:
-                f.write(data)
-
-            # Registrar en la tabla documentos_reserva de Laravel
-            url_db = f"reservas/{id_reserva_old}/{sanitized_name}"
-            new_cur.execute("""
-                INSERT INTO documentos_reserva (reserva_id, url, nombre, created_at, updated_at)
-                VALUES (%s, %s, %s, NOW(), NOW())
-            """, (id_reserva_old, url_db, name))
-
-            count += 1
-        except Exception as e:
-            print(f"   ⚠️ Error migrando documento {id_upload} (Reserva {id_reserva_old}): {e}")
-            skipped += 1
-
-    print(f"   ✓ {count} documentos migrados. {skipped} omitidos.")
-
-
 # ===============================
 # SCRIPT PRINCIPAL
 # ===============================
@@ -938,11 +875,6 @@ def main():
             empresa_map, proveedor_map, transportista_map,
             muelle_map, material_map, tipo_camion_map, estado_map
         )
-
-        # -----------------------
-        # DOCUMENTOS DE RESERVAS
-        # -----------------------
-        migrar_documentos(old_cur, new_cur)
 
         new_conn.commit()
         print("\n✅ Migración completada con éxito.")

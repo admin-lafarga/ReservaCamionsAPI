@@ -13,12 +13,12 @@ class ProveedorPolicy
 {
     public function viewAny(User|Entidad $user): bool
     {
-        return $user instanceof User;
+        return true;
     }
 
     public function view(User|Entidad $user, Proveedor $proveedor): bool
     {
-        return $user instanceof User;
+        return true;
     }
 
     public function create(User|Entidad $user): bool

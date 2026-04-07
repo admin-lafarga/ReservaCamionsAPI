@@ -45,14 +45,8 @@ class TransportistaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Transportista $transportista)
     {
-        $transportista = Transportista::find($id);
-
-        if (!$transportista) {
-            return response()->json(['message' => 'No trobat'], 404);
-        }
-
         return response()->json($transportista);
     }
 

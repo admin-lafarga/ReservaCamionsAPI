@@ -80,4 +80,9 @@ class Reserva extends Model
     {
         return $this->hasMany(DocumentosReserva::class, 'reserva_id');
     }
+
+    public function empresa_lfycs()
+    {
+        return $this->belongsTo(EmpresaLfycs::class, 'empresa_lfycs_id');
+    }
 }

@@ -17,7 +17,9 @@ use App\Models\HorarioMuelle;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use App\Mail\ConfirmationMail;
+use App\Models\Parametro;
 
 class ReservaController extends Controller
 {
@@ -44,7 +46,8 @@ class ReservaController extends Controller
             'material2:material_id,nombre',
             'muelle',
             'estado',
-            'transportista'
+            'transportista.entidad',
+            'empresa_lfycs'
         ];
 
         $query = Reserva::with($relations);
@@ -313,7 +316,7 @@ class ReservaController extends Controller
             'material1_id'        => $validatedData['material1_id'],
             'material2_id'        => $validatedData['material2_id'] ?? null,
             'proveedor_id'        => $validatedData['proveedor_id'],
-            'transportista_id'    => $validatedData['transportista_id'],
+            'transportista_id'    => $validatedData['transportista_id'] ?? null,
             'muelle_id'           => $validatedData['muelle_id'],
             'estado_id'           => $validatedData['estado_id'],
             'empresa_lfycs_id'    => 1,
@@ -347,25 +350,18 @@ class ReservaController extends Controller
 
                 $reserva->documentos()->create([
                     'url' => $ruta,
-                    'name' => $nombreOriginal
+                    'nombre' => $nombreOriginal
                 ]);
             }
         }
 
         // 6️⃣ Enviar email de confirmación
-        try {
-            $reserva->load(['tipoCamion', 'material1', 'material2', 'muelle']);
-            Mail::to('hassan.abbas@lafarga.es')->send(new ConfirmationMail($reserva));
-            return response()->json([
-                'message' => 'Email de confirmación enviado para reserva #' . $reserva->reserva_id,
-            ], 200);
-            // Log::info('Email de confirmación enviado para reserva #' . $reserva->reserva_id);
-        } catch (\Exception $e) {
-            // Log::error('Error enviando email de confirmación: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Error enviando email de confirmación: ' . $e->getMessage(),
-            ], 500);
-        }
+        $this->enviarEmailsReserva($reserva);
+
+        return response()->json([
+            'message' => 'Reserva creada correctamente.',
+            'data' => $reserva,
+        ], 201);
 
         return response()->json([
             'message' => 'Reserva creada correctamente.',
@@ -388,8 +384,7 @@ class ReservaController extends Controller
             'tipoCamion:tipo_camion_id,nombre',
             'material1:material_id,nombre',
             'material2:material_id,nombre',
-            'muelle1',
-            'muelle2',
+            'muelle',
             'estado'
         ]));
     }
@@ -413,7 +408,7 @@ class ReservaController extends Controller
             ->get();
 
         foreach ($conflictos as $reservaExistente) {
-            $muelleExistente = $reservaExistente->muelle1_id;
+            $muelleExistente = $reservaExistente->muelle_id;
 
             $restriccion = Restriccion::where(function ($q) use ($validatedData, $muelleExistente) {
                 $q->where('muelle_id', $validatedData['muelle_id'])
@@ -440,8 +435,8 @@ class ReservaController extends Controller
         $providerType = $provider->tipo_proveedor_id;
 
         $materialesNuevos = array_filter([
-            $validatedData['material_id'] ?? null,
-            $validatedData['material_id'] ?? null,
+            $validatedData['material1_id'] ?? null,
+            $validatedData['material2_id'] ?? null,
         ]);
 
         $bloqueosNuevos = BloqueoGrupoMaterial::where('tipo_proveedor_id', $providerType)
@@ -462,8 +457,8 @@ class ReservaController extends Controller
             if ($reserva->material2_id == $materialId) $cantidadVieja = $reserva->cantidad2 ?? 0;
 
             $cantidadNueva = 0;
-            if ($validatedData['material_id'] == $materialId) $cantidadNueva = $validatedData['cantidad1'];
-            if (($validatedData['material_id'] ?? null) == $materialId) $cantidadNueva = $validatedData['cantidad2'] ?? 0;
+            if ($validatedData['material1_id'] == $materialId) $cantidadNueva = $validatedData['cantidad1'];
+            if (($validatedData['material2_id'] ?? null) == $materialId) $cantidadNueva = $validatedData['cantidad2'] ?? 0;
 
             $diferencias[$bloqueo->bloqueo_grupo_id] = $cantidadNueva - $cantidadVieja;
         }
@@ -494,7 +489,7 @@ class ReservaController extends Controller
         if ($request->hasFile('archivos')) {
             foreach ($request->file('archivos') as $archivo) {
                 $reserva->documentos()->firstOrCreate(
-                    ['name' => $archivo->getClientOriginalName()],
+                    ['nombre' => $archivo->getClientOriginalName()],
                     ['url' => $archivo->store("reservas/{$reserva->reserva_id}")]
                 );
             }
@@ -506,7 +501,7 @@ class ReservaController extends Controller
             'material1_id'   => $validatedData['material1_id'],
             'material2_id'   => $validatedData['material2_id'] ?? null,
             'proveedor_id'        => $validatedData['proveedor_id'],
-            'transportista_id'    => $validatedData['transportista_id'],
+            'transportista_id'    => $validatedData['transportista_id'] ?? null,
             'muelle_id'          => $validatedData['muelle_id'],
             'estado_id'           => $validatedData['estado_id'],
             'cantidad1'           => $validatedData['cantidad1'],
@@ -522,6 +517,9 @@ class ReservaController extends Controller
             'duracion'           => $validatedData['duracion'],
         ]);
 
+        // 5️⃣ Enviar email de actualización
+        $this->enviarEmailsReserva($reserva);
+
         return response()->json([
             'message' => 'Reserva actualizada correctamente.',
             'data' => $reserva
@@ -536,10 +534,8 @@ class ReservaController extends Controller
     {
         // Eliminar fitxers associats a la reserva (si existeixen)
         foreach ($reserva->documentos as $documento) {
-            $filePath = storage_path('app/private/' . $documento->url);
-
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            if (Storage::disk('local')->exists($documento->url)) {
+                Storage::disk('local')->delete($documento->url);
             }
 
             $documento->delete();
@@ -560,29 +556,21 @@ class ReservaController extends Controller
     {
         $this->authorize('viewAny', Reserva::class);
 
-        $fullPath = storage_path('app/private/' . $path);
-        $realBase = realpath(storage_path('app/private'));
-        $realFullPath = realpath($fullPath);
-
-        if (!$realFullPath || strpos($realFullPath, $realBase) !== 0) {
-            return response("Accés no autoritzat", 403);
-        }
-
-        if (!file_exists($realFullPath)) {
-            return response("Fitxer no trobat: " . $realFullPath, 404);
-        }
-
         $document = DocumentosReserva::where('url', $path)->first();
         if (!$document) {
             return response("Document no trobat a la base de dades", 404);
         }
 
-        $filename = $document->name;
+        if (!Storage::disk('local')->exists($path)) {
+            return response("Fitxer no trobat al servidor", 404);
+        }
 
-        $mimeType = mime_content_type($realFullPath);
+        $filename = $document->nombre;
+        $mimeType = Storage::disk('local')->mimeType($path);
 
-        return response()->download($realFullPath, $filename, [
+        return response(Storage::disk('local')->get($path), 200, [
             'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . $filename . '"'
         ]);
     }
 
@@ -596,28 +584,22 @@ class ReservaController extends Controller
             return response("Document no trobat a la base de dades", 404);
         }
 
-        $filename = $document->name;
+        $filename = $document->nombre;
         $reservaId = $document->reserva_id;
 
         return response()->json([
-            'name' => $filename,
+            'nombre' => $filename,
         ]);
     }
 
     // Funció per eliminar un fitxer privat
     public function deletePrivateFile($id)
     {
-        $this->authorize('delete', new Reserva());
-
         $booking_document = DocumentosReserva::findOrFail($id);
 
-        $filePath = storage_path('app/private/' . $booking_document->url);
-
-        if (!file_exists($filePath)) {
-            return response()->json(['error' => 'Fitxer no trobat'], 404);
+        if (Storage::disk('local')->exists($booking_document->url)) {
+            Storage::disk('local')->delete($booking_document->url);
         }
-
-        unlink($filePath);
 
         $booking_document->delete();
 
@@ -685,8 +667,8 @@ class ReservaController extends Controller
             "Cantidad 2"
         ];
 
-        $reservas = Reserva::with(['tipoCamion', 'material', 'material1', 'proveedor', 'transportista', 'muelle1', 'muelle2', 'empresa_lfycs', 'status'])
-            ->whereBetween('inicio1', [$from, $to])
+        $reservas = Reserva::with(['tipoCamion', 'material1', 'material2', 'proveedor', 'transportista', 'muelle', 'estado'])
+            ->whereBetween('inicio', [$from, $to])
             ->get();
 
 
@@ -698,42 +680,42 @@ class ReservaController extends Controller
             foreach ($reservas as $reserva) {
                 fputcsv($handle, [
                     $reserva->reserva_id,
-                    $reserva->pedido_LF,
+                    $reserva->pedido1,
                     $reserva->tipoCamion->nombre ?? '',
                     $reserva->material1->nombre ?? '',
                     $reserva->cantidad1,
                     $reserva->proveedor->codigo_sap ?? '',
-                    $reserva->proveedor->nombre ?? '',
-                    $reserva->proveedor->abreviatura ?? '',
-                    $reserva->proveedor->NIF ?? '',
-                    $reserva->proveedor->nombre_contacto ?? '',
-                    $reserva->proveedor->email ?? '',
-                    $reserva->proveedor->tel1 ?? '',
-                    $reserva->proveedor->tel2 ?? '',
-                    $reserva->Carrier->nombre ?? '',
-                    $reserva->Carrier->abreviatura ?? '',
-                    $reserva->Carrier->NIF ?? '',
-                    $reserva->Carrier->nombre_contacto ?? '',
-                    $reserva->Carrier->email ?? '',
-                    $reserva->Carrier->tel1 ?? '',
-                    $reserva->Carrier->tel2 ?? '',
+                    $reserva->proveedor->entidad->nombre ?? '',
+                    '',
+                    $reserva->proveedor->entidad->nif ?? '',
+                    '',
+                    $reserva->proveedor->entidad->email ?? '',
+                    $reserva->proveedor->entidad->telefono1 ?? '',
+                    '',
+                    $reserva->transportista->entidad->nombre ?? '',
+                    '',
+                    $reserva->transportista->entidad->nif ?? '',
+                    '',
+                    $reserva->transportista->entidad->email ?? '',
+                    $reserva->transportista->entidad->telefono1 ?? '',
+                    '',
                     $reserva->matricula_camion,
-                    $reserva->inicio1,
-                    $reserva->fin1,
-                    $reserva->muelle1->nombre ?? '',
-                    $reserva->muelle1->descripcion ?? '',
-                    $reserva->status->nombre ?? '',
-                    $reserva->es_aduana ? 1 : 0,
+                    $reserva->inicio,
+                    $reserva->fin,
+                    $reserva->muelle->nombre ?? '',
+                    $reserva->muelle->descripcion ?? '',
+                    $reserva->estado->nombre ?? '',
+                    $reserva->aduana ? 1 : 0,
                     $reserva->created_at,
                     $reserva->notas,
-                    $reserva->empresa_lfycs->nombre ?? '',
-                    $reserva->empresa_lfycs->descripcion ?? '',
-                    $reserva->tel1,
-                    $reserva->tipo_material2_id->nombre ?? '',
-                    $reserva->inicio2,
-                    $reserva->fin2,
-                    $reserva->muelle2->nombre ?? '',
-                    $reserva->muelle2->descripcion ?? '',
+                    '',
+                    '',
+                    $reserva->telefono,
+                    $reserva->material2->nombre ?? '',
+                    '',
+                    '',
+                    '',
+                    '',
                     $reserva->cantidad2
                 ], ';', '"');
             }
@@ -745,5 +727,44 @@ class ReservaController extends Controller
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename={$fileName}"
         ]);
+    }
+
+    /**
+     * Envía emails de confirmación o actualización a los destinatarios correspondientes.
+     */
+    private function enviarEmailsReserva(Reserva $reserva)
+    {
+        try {
+            $destinatarios = [];
+
+            // 1. Email del proveedor
+            $reserva->load(['proveedor.entidad', 'transportista.entidad']);
+            
+            if ($reserva->proveedor && $reserva->proveedor->entidad && $reserva->proveedor->entidad->email) {
+                $destinatarios[] = $reserva->proveedor->entidad->email;
+            }
+
+            // 2. Email del transportista
+            if ($reserva->transportista && $reserva->transportista->entidad && $reserva->transportista->entidad->email) {
+                $destinatarios[] = $reserva->transportista->entidad->email;
+            }
+
+            // 3. Email interno configurado en parámetros
+            $emailInterno = Parametro::where('clave', 'email_notificaciones_recepcion')->value('valor');
+            if ($emailInterno) {
+                $destinatarios[] = $emailInterno;
+            }
+
+            // Eliminar duplicados y valores vacíos
+            $destinatarios = array_unique(array_filter($destinatarios));
+
+            if (!empty($destinatarios)) {
+                $reserva->load(['tipoCamion', 'material1', 'material2', 'muelle', 'empresa_lfycs']);
+                Mail::to($destinatarios)->send(new ConfirmationMail($reserva));
+                Log::info('Emails de confirmación enviados para reserva #' . $reserva->reserva_id . ' a: ' . implode(', ', $destinatarios));
+            }
+        } catch (\Exception $e) {
+            Log::error('Error enviando emails para reserva #' . $reserva->reserva_id . ': ' . $e->getMessage());
+        }
     }
 }
