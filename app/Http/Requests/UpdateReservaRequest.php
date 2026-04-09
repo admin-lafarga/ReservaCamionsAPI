@@ -14,6 +14,37 @@ class UpdateReservaRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        if ($this->isMethod('patch') || $this->isMethod('put')) {
+            $reserva = $this->route('reserva');
+            if ($reserva) {
+                // Si la petición no envía algún campo, usamos el de la reserva actual
+                // para que pasen las validaciones globales.
+                $this->mergeIfMissing([
+                    'tipo_camion_id'   => $reserva->tipo_camion_id,
+                    'material1_id'     => $reserva->material1_id,
+                    'material2_id'     => $reserva->material2_id,
+                    'proveedor_id'     => $reserva->proveedor_id,
+                    'transportista_id' => $reserva->transportista_id,
+                    'muelle_id'        => $reserva->muelle_id,
+                    'estado_id'        => $reserva->estado_id,
+                    'cantidad1'        => $reserva->cantidad1,
+                    'cantidad2'        => $reserva->cantidad2,
+                    'pedido1'          => $reserva->pedido1,
+                    'pedido2'          => $reserva->pedido2,
+                    'matricula_camion' => $reserva->matricula_camion,
+                    'inicio'           => $reserva->inicio,
+                    'fin'              => $reserva->fin,
+                    'aduana'           => $reserva->aduana,
+                    'notas'            => $reserva->notas,
+                    'telefono'         => $reserva->telefono,
+                    'duracion'         => $reserva->duracion,
+                ]);
+            }
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *

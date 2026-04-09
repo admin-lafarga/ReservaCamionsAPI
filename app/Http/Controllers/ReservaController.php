@@ -400,6 +400,36 @@ class ReservaController extends Controller
     {
         $validatedData = $request->validated();
         
+        // 0️⃣ Validar horario operativo del muelle
+        $fechaInicio = Carbon::parse($validatedData['inicio']);
+        $fechaFin = Carbon::parse($validatedData['fin']);
+        
+        // Obtener día de la semana (1 = Lunes, 7 = Domingo)
+        $diaSemana = $fechaInicio->dayOfWeekIso;
+
+        $horario = HorarioMuelle::where('muelle_id', $validatedData['muelle_id'])
+            ->where('dia_semana', $diaSemana)
+            ->first();
+
+        if (!$horario) {
+            return response()->json([
+                'id' => 3,
+                'message' => 'El muelle seleccionado no está operativo este día de la semana.',
+                'muelle_id' => $validatedData['muelle_id']
+            ], 422);
+        }
+
+        $horaInicioReserva = $fechaInicio->format('H:i:s');
+        $horaFinReserva = $fechaFin->format('H:i:s');
+
+        if ($horaInicioReserva < $horario->inicio || $horaFinReserva > $horario->fin) {
+            return response()->json([
+                'id' => 4,
+                'message' => "La reserva está fuera del horario operativo ({$horario->inicio} - {$horario->fin}).",
+                'muelle_id' => $validatedData['muelle_id']
+            ], 422);
+        }
+
         // 1️⃣ Validación de solapamiento y restricciones de muelle
         $conflictos = Reserva::where('muelle_id', $validatedData['muelle_id'])
             ->where('reserva_id', '!=', $reserva->reserva_id) // Excluir la propia reserva
@@ -428,6 +458,23 @@ class ReservaController extends Controller
                     'muelle_restringido_id' => $restriccion->muelle_restringido_id,
                 ], 422);
             }
+        }
+
+        // 1.5️⃣ Validar que el muelle no esté bloqueado (específico o global)
+        $bloqueoMuelle = BloqueoMuelle::where(function($q) use ($validatedData) {
+                $q->where('muelle_id', $validatedData['muelle_id'])
+                  ->orWhereNull('muelle_id'); // Verificar bloqueos globales
+            })
+            ->where('inicio', '<', $validatedData['fin'])
+            ->where('fin', '>', $validatedData['inicio'])
+            ->first();
+
+        if ($bloqueoMuelle) {
+            return response()->json([
+                'id' => 2,
+                'message' => 'No es posible reservar este muelle en estas fechas',
+                
+            ], 422);
         }
 
         // 2️⃣ Validación de disponibilidad de materiales
