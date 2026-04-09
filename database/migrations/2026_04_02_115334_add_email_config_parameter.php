@@ -13,7 +13,7 @@ return new class extends Migration
     {
         \App\Models\Parametro::updateOrCreate(
             ['clave' => 'email_notificaciones_recepcion'],
-            ['valor' => 'hassan.abbas@lafarga.es'] // Default value as requested for testing, but easily changeable
+            ['valor' => ''] // Default value as requested for testing, but easily changeable
         );
     }
 

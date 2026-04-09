@@ -939,10 +939,10 @@ def main():
             muelle_map, material_map, tipo_camion_map, estado_map
         )
 
-        # -----------------------
-        # DOCUMENTOS DE RESERVAS
-        # -----------------------
-        migrar_documentos(old_cur, new_cur)
+        # # -----------------------
+        # # DOCUMENTOS DE RESERVAS
+        # # -----------------------
+        # migrar_documentos(old_cur, new_cur)
 
         new_conn.commit()
         print("\n✅ Migración completada con éxito.")
