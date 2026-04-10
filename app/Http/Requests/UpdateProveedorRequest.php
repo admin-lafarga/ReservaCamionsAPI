@@ -29,7 +29,7 @@ class UpdateProveedorRequest extends FormRequest
         return [
             // 🔹 Reglas del proveedor
             'tipo_proveedor_id' => 'required|exists:tipo_proveedores,tipo_proveedor_id',
-            'email_notificaciones' => 'required|email|max:255|unique:proveedores,email_notificaciones,' . $proveedorId . ',proveedor_id',
+            'email_notificaciones' => 'required|email|max:255',
 
             // 🔹 Reglas de la entidad asociada
             'entidad' => 'required|array',

@@ -23,6 +23,13 @@ class TransportistaController extends Controller
     public function index()
     {
         $transportistas = Transportista::with(['entidad'])->get();
+
+        $transportistas->each(function ($transportista) {
+            if ($transportista->entidad) {
+                $transportista->entidad->makeVisible('pin');
+            }
+        });
+
         return response()->json($transportistas);
     }
 
@@ -47,6 +54,10 @@ class TransportistaController extends Controller
      */
     public function show(Transportista $transportista)
     {
+        $transportista->load('entidad');
+        if ($transportista->entidad) {
+            $transportista->entidad->makeVisible('pin');
+        }
         return response()->json($transportista);
     }
 

@@ -345,7 +345,7 @@ class ReservaController extends Controller
         // 5️⃣ Guardar archivos adjuntos
         if ($request->hasFile('archivos')) {
             foreach ($request->file('archivos') as $archivo) {
-                $ruta = $archivo->store("reservas/{$reserva->id}");
+                $ruta = $archivo->store("reservas/{$reserva->reserva_id}");
                 $nombreOriginal = $archivo->getClientOriginalName();
 
                 $reserva->documentos()->create([
@@ -357,11 +357,6 @@ class ReservaController extends Controller
 
         // 6️⃣ Enviar email de confirmación
         $this->enviarEmailsReserva($reserva);
-
-        return response()->json([
-            'message' => 'Reserva creada correctamente.',
-            'data' => $reserva,
-        ], 201);
 
         return response()->json([
             'message' => 'Reserva creada correctamente.',

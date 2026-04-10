@@ -24,6 +24,13 @@ class ProveedorController extends Controller
             'tipoProveedor:tipo_proveedor_id,nombre',
             'entidad'
             ])->get();
+
+        $proveedors->each(function ($proveedor) {
+            if ($proveedor->entidad) {
+                $proveedor->entidad->makeVisible('pin');
+            }
+        });
+
         return response()->json($proveedors);
     }
 
@@ -50,6 +57,10 @@ class ProveedorController extends Controller
      */
     public function show(Proveedor $proveedor)
     {
+        $proveedor->load(['tipoProveedor', 'entidad']);
+        if ($proveedor->entidad) {
+            $proveedor->entidad->makeVisible('pin');
+        }
         return response()->json($proveedor);
     }
 

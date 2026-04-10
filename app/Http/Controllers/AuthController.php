@@ -46,14 +46,16 @@ class AuthController extends Controller
         }
 
 
-        // Buscar usuario por email o username
-        $user = $isEmail
-            ? User::where('email', $login)->first()
-            : User::where('username', $login)->first();
+        // Buscar usuario interno por email o username
+        $user = User::where('email', $login)
+            ->orWhere('username', $login)
+            ->first();
 
-
+        // Si no se encuentra, buscar entidad (proveedor/transportista) por email o nombre
         if ($user === null) {
-            $user = Entidad::where('nombre', $login)->first();
+            $user = Entidad::where('email', $login)
+                ->orWhere('nombre', $login)
+                ->first();
         }
 
         if (!$user) {
