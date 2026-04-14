@@ -20,10 +20,14 @@ class ProveedorController extends Controller
      */
     public function index()
     {
-        $proveedors = Proveedor::with([
-            'tipoProveedor:tipo_proveedor_id,nombre',
-            'entidad'
-            ])->get();
+        $proveedors = Proveedor::join('entidades', 'proveedores.entidad_id', '=', 'entidades.entidad_id')
+            ->select('proveedores.*')
+            ->with([
+                'tipoProveedor:tipo_proveedor_id,nombre',
+                'entidad'
+            ])
+            ->orderBy('entidades.nombre', 'asc')
+            ->get();
 
         $proveedors->each(function ($proveedor) {
             if ($proveedor->entidad) {

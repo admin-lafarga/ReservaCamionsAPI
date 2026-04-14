@@ -22,7 +22,11 @@ class TransportistaController extends Controller
      */
     public function index()
     {
-        $transportistas = Transportista::with(['entidad'])->get();
+        $transportistas = Transportista::join('entidades', 'transportistas.entidad_id', '=', 'entidades.entidad_id')
+            ->select('transportistas.*')
+            ->with(['entidad'])
+            ->orderBy('entidades.nombre', 'asc')
+            ->get();
 
         $transportistas->each(function ($transportista) {
             if ($transportista->entidad) {

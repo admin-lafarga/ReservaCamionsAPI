@@ -72,6 +72,18 @@ class ReservaController extends Controller
             $query->where('inicio', '>=', now()->startOfDay());
         } elseif ($statusFilter === 'antiguas') {
             $query->where('inicio', '<', now()->startOfDay());
+        } elseif ($statusFilter === 'no_asistidos') {
+            $query->whereHas('estado', function($q) {
+                $q->where('nombre', 'No asistió');
+            });
+        }
+
+        // 3.5. Filtro por Rango de Fechas
+        if ($startDate = $request->input('start_date')) {
+            $query->whereDate('inicio', '>=', Carbon::parse($startDate)->startOfDay());
+        }
+        if ($endDate = $request->input('end_date')) {
+            $query->whereDate('inicio', '<=', Carbon::parse($endDate)->endOfDay());
         }
 
         // 4. Búsqueda global (search)
@@ -164,6 +176,7 @@ class ReservaController extends Controller
             'material1:material_id,nombre',
             'material2:material_id,nombre',
             'muelle',
+            'estado',
         ])
             ->get();
 

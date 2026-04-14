@@ -38,9 +38,9 @@ class MaterialController extends Controller
         
 
         if (!empty($ids)) {
-            $materials = $query->whereIn('material_id', $ids)->get();
+            $materials = $query->whereIn('material_id', $ids)->orderBy('nombre', 'asc')->get();
         } else {
-            $materials = $query->get();
+            $materials = $query->orderBy('nombre', 'asc')->get();
         }
 
         return response()->json($materials);

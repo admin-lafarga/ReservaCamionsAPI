@@ -60,11 +60,11 @@ class BloqueoGrupoMaterialController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBloqueoGrupoMaterialRequest $request, int $id)
+    public function update(UpdateBloqueoGrupoMaterialRequest $request, BloqueoGrupoMaterial $grupo)
     {
         $validated = $request->validated();
 
-        $grupo = BloqueoGrupoMaterial::findOrFail($id);
+
 
         $grupo->update([
             'tipo_proveedor_id' => (int) $validated['tipo_proveedor_id'],
@@ -90,10 +90,9 @@ class BloqueoGrupoMaterialController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id)
+    public function destroy(BloqueoGrupoMaterial $grupo)
     {
         //Eliminar el bloqueo y sus detalles
-        $grupo = BloqueoGrupoMaterial::findOrFail($id);
         $grupo->detalles()->delete();
         $grupo->delete();
 
