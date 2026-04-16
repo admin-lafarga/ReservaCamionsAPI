@@ -722,8 +722,19 @@ class ReservaController extends Controller
             "Cantidad 2"
         ];
 
-        $reservas = Reserva::with(['tipoCamion', 'material1', 'material2', 'proveedor', 'transportista', 'muelle', 'estado'])
-            ->whereBetween('inicio', [$from, $to])
+        $reservas = Reserva::with([
+            'tipoCamion', 
+            'material1', 
+            'material2', 
+            'proveedor.entidad', 
+            'proveedor.tipoProveedor', 
+            'transportista.entidad', 
+            'muelle', 
+            'estado'
+        ])
+            ->whereDate('inicio', '>=', Carbon::parse($from)->startOfDay())
+            ->whereDate('inicio', '<=', Carbon::parse($to)->endOfDay())
+            ->orderBy('inicio', 'desc')
             ->get();
 
 
@@ -736,37 +747,37 @@ class ReservaController extends Controller
                 fputcsv($handle, [
                     $reserva->reserva_id,
                     $reserva->pedido1,
-                    $reserva->tipoCamion->nombre ?? '',
-                    $reserva->material1->nombre ?? '',
+                    $reserva->tipoCamion?->nombre ?? '',
+                    $reserva->material1?->nombre ?? '',
                     $reserva->cantidad1,
-                    $reserva->proveedor->codigo_sap ?? '',
-                    $reserva->proveedor->entidad->nombre ?? '',
+                    $reserva->proveedor?->codigo_sap ?? '',
+                    $reserva->proveedor?->entidad?->nombre ?? '',
                     '',
-                    $reserva->proveedor->entidad->nif ?? '',
+                    $reserva->proveedor?->entidad?->nif ?? '',
                     '',
-                    $reserva->proveedor->entidad->email ?? '',
-                    $reserva->proveedor->entidad->telefono1 ?? '',
+                    $reserva->proveedor?->entidad?->email ?? '',
+                    $reserva->proveedor?->entidad?->telefono1 ?? '',
                     '',
-                    $reserva->transportista->entidad->nombre ?? '',
+                    $reserva->transportista?->entidad?->nombre ?? '',
                     '',
-                    $reserva->transportista->entidad->nif ?? '',
+                    $reserva->transportista?->entidad?->nif ?? '',
                     '',
-                    $reserva->transportista->entidad->email ?? '',
-                    $reserva->transportista->entidad->telefono1 ?? '',
+                    $reserva->transportista?->entidad?->email ?? '',
+                    $reserva->transportista?->entidad?->telefono1 ?? '',
                     '',
                     $reserva->matricula_camion,
                     $reserva->inicio,
                     $reserva->fin,
-                    $reserva->muelle->nombre ?? '',
-                    $reserva->muelle->descripcion ?? '',
-                    $reserva->estado->nombre ?? '',
+                    $reserva->muelle?->nombre ?? '',
+                    $reserva->muelle?->descripcion ?? '',
+                    $reserva->estado?->nombre ?? '',
                     $reserva->aduana ? 1 : 0,
                     $reserva->created_at,
                     $reserva->notas,
                     '',
                     '',
                     $reserva->telefono,
-                    $reserva->material2->nombre ?? '',
+                    $reserva->material2?->nombre ?? '',
                     '',
                     '',
                     '',

@@ -34,20 +34,6 @@ Route::get('/', function (Request $request) {
         'ip' => $request->getClientIp(),
     ], 200);
 });
-//Ruta para probar la conexión de la bbdd
-Route::get('/db-test', function () {
-    try {
-        DB::connection()->getPdo();
-        return response()->json(['message' => 'Database connection is successful.'], 200);
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'Database connection failed: ' . $e->getMessage()], 500);
-    }
-})->middleware('auth:sanctum');
-
-Route::get('test', function(){
-    return 'exitos';
-})->middleware('auth:sanctum');
-
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -73,23 +59,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('tipoproveedores', TipoProveedorController::class)->parameters(['tipoproveedores' => 'tipoProveedor']);
     Route::apiResource('tipocamiones', TipoCamionController::class);
     Route::apiResource('materiales', MaterialController::class)->Parameter('materiales', 'material');
-    Route::apiResource('roles', RolController::class);
     Route::delete('restricciones/bulk-delete', [RestriccionController::class, 'bulkDelete']);
     Route::apiResource('restricciones', RestriccionController::class)->parameters(['restricciones' => 'restriccion']);
     Route::apiResource('status', EstadoController::class);
-    // Route::apiResource('bloqueo/camion/material', BloqueoCamionMaterialController::class);
     Route::apiResource('empresas_lfycs', EmpresaLfycsController::class)->parameter('empresas_lfycs', 'empresa');
     Route::apiResource('muelle/horarios', HorarioMuelleController::class);
     Route::apiResource('muelles', MuelleController::class);
     Route::apiResource('reserva', ReservaController::class);
-    Route::apiResource('permisos', PermisoController::class);
     Route::get('bloqueo/grupos/material/{materialId}', [BloqueoGrupoMaterialController::class, 'getByMaterial']);
     Route::apiResource('bloqueo/grupos', BloqueoGrupoMaterialController::class);
     Route::apiResource('bloqueo/grupo/detalles', BloqueoGrupoMaterialDetalleController::class);
     Route::get('config/claves', [ParametroController::class, 'getParametrosByKeys']);
     Route::put('config/claves', [ParametroController::class, 'storeParametrosByKeys']);
     Route::apiResource('config', ParametroController::class);
-    Route::get('reservas/informe', [ReservaController::class, 'informeReservas']);
     Route::post('report', [ReservaController::class, 'generateReport']);
 
     //Esto es para obtener las columnas de una tabla dinámicamnete desde el frontend y hay que permitirlas para que no de error de sql injection
