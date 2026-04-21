@@ -112,7 +112,7 @@ class ReservaController extends Controller
         }
 
         // 5. Ordenamiento (Sort)
-        $sortField = $request->input('sort', 'inicio');
+        $sortField = $request->input('sort', 'reserva_id');
         $sortDir = $request->input('dir', 'desc');
         
         // Mapeo seguro de columnas para no fallar con relaciones
@@ -120,7 +120,7 @@ class ReservaController extends Controller
         if (in_array($sortField, $allowedSorts)) {
             $query->orderBy($sortField, $sortDir === 'asc' ? 'asc' : 'desc');
         } else {
-            $query->orderBy('inicio', 'desc');
+            $query->orderBy('reserva_id', 'desc');
         }
 
         // 6. Finalmente, paginamos (por defecto 10 por página)
