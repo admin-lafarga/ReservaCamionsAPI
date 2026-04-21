@@ -407,7 +407,12 @@ class ReservaController extends Controller
     public function update(UpdateReservaRequest $request, Reserva $reserva)
     {
         $validatedData = $request->validated();
-        
+        $user = $request->user();
+        $isExternal = $user instanceof \App\Models\Entidad;
+        $isFargaAdmin = !$isExternal && $user->rol_id == 3;
+        $adminOverride = !empty($validatedData['admin_override']) && $isFargaAdmin;
+
+        if (!$adminOverride) {
         // 0️⃣ Validar horario operativo del muelle
         $fechaInicio = Carbon::parse($validatedData['inicio']);
         $fechaFin = Carbon::parse($validatedData['fin']);
@@ -539,6 +544,7 @@ class ReservaController extends Controller
                 $bloqueo->save();
             }
         }
+        } // Fin if (!$adminOverride)
 
         // 3️⃣ Archivos adjuntos
         if ($request->hasFile('archivos')) {

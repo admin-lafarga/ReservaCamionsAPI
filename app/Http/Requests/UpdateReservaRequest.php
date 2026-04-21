@@ -73,6 +73,7 @@ class UpdateReservaRequest extends FormRequest
             'duracion'           => ['required', 'integer', 'min:0'],
             'archivos' => ['nullable', 'array'],
             'archivos.*' => ['file', 'max:5120'],
+            'admin_override' => ['nullable', 'boolean'],
         ];
     }
 }

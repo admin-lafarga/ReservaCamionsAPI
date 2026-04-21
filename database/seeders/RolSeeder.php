@@ -10,7 +10,7 @@ class RolSeeder extends Seeder {
         Rol::insert([
             ['nombre' => 'Administrador', 'descripcion' => 'Accés complet a tots els mòduls'],
             ['nombre' => 'Editor', 'descripcion' => 'Pot accedir a l\'edició dels mòduls'],
-            ['visor' => 'Visor', 'descripcion' => 'Només pot visualitzar la informació dels mòduls'],
+            ['nombre' => 'Visor', 'descripcion' => 'Només pot visualitzar la informació dels mòduls'],
         ]);
     }
 }
