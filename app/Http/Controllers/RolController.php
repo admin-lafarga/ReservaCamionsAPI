@@ -41,15 +41,15 @@ class RolController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Rol $tipus_Usuari)
+    public function show(Rol $role)
     {
-        //
+        return response()->json($role);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Rol $tipus_Usuari)
+    public function edit(Rol $role)
     {
         //
     }
@@ -57,7 +57,7 @@ class RolController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRolRequest $request, Rol $tipus_Usuari)
+    public function update(UpdateRolRequest $request, Rol $role)
     {
         //
     }
@@ -65,7 +65,7 @@ class RolController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Rol $tipus_Usuari)
+    public function destroy(Rol $role)
     {
         //
     }

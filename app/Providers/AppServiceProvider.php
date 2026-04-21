@@ -89,5 +89,15 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Rol::class, RolPolicy::class);
         Gate::policy(TipoCamion::class, TipoCamionPolicy::class);
         Gate::policy(TipoProveedor::class, TipoProveedorPolicy::class);
+
+        // Enforce Read-Only mode for Role ID 2 (La Farga - View)
+        Gate::before(function ($user, $ability) {
+            if ($user instanceof User && $user->rol_id == 2) {
+                $mutationAbilities = ['create', 'update', 'delete', 'restore', 'forceDelete', 'store', 'destroy'];
+                if (in_array($ability, $mutationAbilities)) {
+                    return false;
+                }
+            }
+        });
     }
 }

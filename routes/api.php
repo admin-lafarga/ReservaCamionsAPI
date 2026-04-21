@@ -72,6 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('config/claves', [ParametroController::class, 'getParametrosByKeys']);
     Route::put('config/claves', [ParametroController::class, 'storeParametrosByKeys']);
     Route::apiResource('config', ParametroController::class);
+    Route::apiResource('roles', RolController::class);
     Route::post('report', [ReservaController::class, 'generateReport']);
 
     //Esto es para obtener las columnas de una tabla dinámicamnete desde el frontend y hay que permitirlas para que no de error de sql injection
