@@ -578,8 +578,10 @@ class ReservaController extends Controller
             'duracion'           => $validatedData['duracion'],
         ]);
 
-        // 5️⃣ Enviar email de actualización
-        $this->enviarEmailsReserva($reserva);
+        // 5️⃣ Enviar email de actualización (temporalmente: solo si lo modifica el usuario externo creador)
+        if ($isExternal) {
+            $this->enviarEmailsReserva($reserva);
+        }
 
         return response()->json([
             'message' => 'Reserva actualizada correctamente.',
