@@ -410,7 +410,7 @@ class ReservaController extends Controller
         $user = $request->user();
         $isExternal = $user instanceof \App\Models\Entidad;
         $isFargaAdmin = !$isExternal && $user->rol_id == 3;
-        $adminOverride = !empty($validatedData['admin_override']) && $isFargaAdmin;
+        $adminOverride = $isFargaAdmin || (!empty($validatedData['admin_override']) && $isFargaAdmin);
 
         if (!$adminOverride) {
         // 0️⃣ Validar horario operativo del muelle
