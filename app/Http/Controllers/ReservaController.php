@@ -135,39 +135,10 @@ class ReservaController extends Controller
     {
         $this->authorize('viewAny', Reserva::class);
         $user = $request->user();
-        
-        // 1. Preparamos la query base cargando la relación del muelle (necesaria para el color en el front)
-        $query = Reserva::with('muelle'); 
+        $isExternal = $user instanceof Entidad;
 
-        // Opcional: Filtra por fechas si recibes 'start' y 'end' del FullCalendar
-        if ($request->has(['start', 'end'])) {
-            $query->whereBetween('inicio', [$request->start, $request->end]);
-        }
-
-        $reservas = $query->get();
-
-        // 2. Lógica de SEGURIDAD: Detectar si es usuario externo
-        // En este proyecto, los externos son instancias del modelo Entidad (Proveedores/Transportistas)
-        $isExternal = $user instanceof Entidad; 
-
-        if ($isExternal) {
-            // Mapeamos para devolver SOLO lo necesario (start, end, y muelle para el color)
-            return $reservas->map(function($reserva) {
-                return [
-                    'reserva_id' => $reserva->reserva_id, // ID por si acaso
-                    'inicio'     => $reserva->inicio,
-                    'fin'        => $reserva->fin,
-                    // MUY IMPORTANTE: Devolver estructura de muelle con color para que el Front pinte las cajas
-                    'muelle'     => [
-                        'muelle_id' => $reserva->muelle_id,
-                        'color'     => $reserva->muelle ? $reserva->muelle->color : '#cccccc', // Color fallback
-                    ],
-                    // NO devolvemos ni proveedor, ni matricula, ni materiales
-                ];
-            });
-        }
-
-        $reservas = Reserva::with([
+        // 1. Relaciones base para usuarios internos
+        $internalRelations = [
             'documentos',
             'proveedor:proveedor_id,entidad_id,tipo_proveedor_id',
             'proveedor.entidad:entidad_id,nombre',
@@ -177,8 +148,35 @@ class ReservaController extends Controller
             'material2:material_id,nombre',
             'muelle',
             'estado',
-        ])
-            ->get();
+        ];
+
+        // 2. Preparamos la query base. Si es externo, solo necesitamos el muelle para el color.
+        $query = Reserva::with($isExternal ? ['muelle'] : $internalRelations);
+
+        // 3. Filtro por fechas (FullCalendar envía 'start' y 'end' como ISO8601)
+        if ($request->has(['start', 'end'])) {
+            $query->where(function($q) use ($request) {
+                $q->whereBetween('inicio', [$request->start, $request->end])
+                  ->orWhereBetween('fin', [$request->start, $request->end]);
+            });
+        }
+
+        $reservas = $query->get();
+
+        if ($isExternal) {
+            // Mapeamos para devolver SOLO lo necesario (start, end, y muelle para el color) por seguridad
+            return $reservas->map(function ($reserva) {
+                return [
+                    'reserva_id' => $reserva->reserva_id,
+                    'inicio'     => $reserva->inicio,
+                    'fin'        => $reserva->fin,
+                    'muelle'     => [
+                        'muelle_id' => $reserva->muelle_id,
+                        'color'     => $reserva->muelle ? $reserva->muelle->color : '#cccccc',
+                    ],
+                ];
+            });
+        }
 
         return response()->json($reservas);
     }
