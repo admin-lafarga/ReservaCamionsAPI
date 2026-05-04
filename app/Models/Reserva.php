@@ -37,6 +37,7 @@ class Reserva extends Model
         'aduana',
         'notas',
         'telefono',
+        'es_replanificada',
     ];
 
     public function tipoCamion()

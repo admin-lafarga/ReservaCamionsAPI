@@ -150,8 +150,8 @@ class ReservaController extends Controller
             'estado',
         ];
 
-        // 2. Preparamos la query base. Si es externo, solo necesitamos el muelle para el color.
-        $query = Reserva::with($isExternal ? ['muelle'] : $internalRelations);
+        // 2. Preparamos la query base.
+        $query = Reserva::with(array_merge($internalRelations, ['transportista.entidad']));
 
         // 3. Filtro por fechas (FullCalendar envía 'start' y 'end' como ISO8601)
         if ($request->has(['start', 'end'])) {
@@ -164,13 +164,24 @@ class ReservaController extends Controller
         $reservas = $query->get();
 
         if ($isExternal) {
-            // Mapeamos para devolver SOLO lo necesario (start, end, y muelle para el color) por seguridad
-            return $reservas->map(function ($reserva) {
+            return $reservas->map(function ($reserva) use ($user) {
+                $isMine = ($reserva->proveedor && $reserva->proveedor->entidad_id === $user->entidad_id) ||
+                          ($reserva->transportista && $reserva->transportista->entidad_id === $user->entidad_id);
+
+                if ($isMine) {
+                    // Si es mía, devolvemos todo lo que necesita el frontend para el tooltip y edición
+                    $reservaArray = $reserva->toArray();
+                    $reservaArray['is_mine'] = true;
+                    return $reservaArray;
+                }
+
                 return [
-                    'reserva_id' => $reserva->reserva_id,
-                    'inicio'     => $reserva->inicio,
-                    'fin'        => $reserva->fin,
-                    'muelle'     => [
+                    'reserva_id'       => $reserva->reserva_id,
+                    'inicio'           => $reserva->inicio,
+                    'fin'              => $reserva->fin,
+                    'es_replanificada' => $reserva->es_replanificada,
+                    'is_mine'          => false,
+                    'muelle'           => [
                         'muelle_id' => $reserva->muelle_id,
                         'color'     => $reserva->muelle ? $reserva->muelle->color : '#cccccc',
                     ],
@@ -410,7 +421,10 @@ class ReservaController extends Controller
         $isFargaAdmin = !$isExternal && $user->rol_id == 3;
         $adminOverride = $isFargaAdmin || (!empty($validatedData['admin_override']) && $isFargaAdmin);
 
-        if (!$adminOverride) {
+        // Si ya estaba marcada como replanificada por un admin, permitimos el movimiento sin validaciones
+        $skipValidations = $adminOverride || $reserva->es_replanificada;
+
+        if (!$skipValidations) {
         // 0️⃣ Validar horario operativo del muelle
         $fechaInicio = Carbon::parse($validatedData['inicio']);
         $fechaFin = Carbon::parse($validatedData['fin']);
@@ -542,7 +556,38 @@ class ReservaController extends Controller
                 $bloqueo->save();
             }
         }
-        } // Fin if (!$adminOverride)
+        } // Fin if (!$skipValidations)
+
+        // 2.5️⃣ Solo admins pueden cambiar el flag de replanificada
+        $updateData = [
+            'tipo_camion_id'      => $validatedData['tipo_camion_id'],
+            'material1_id'        => $validatedData['material1_id'],
+            'material2_id'        => $validatedData['material2_id'] ?? null,
+            'proveedor_id'        => $validatedData['proveedor_id'],
+            'transportista_id'    => $validatedData['transportista_id'] ?? null,
+            'muelle_id'           => $validatedData['muelle_id'],
+            'estado_id'           => $validatedData['estado_id'],
+            'cantidad1'           => $validatedData['cantidad1'],
+            'cantidad2'           => $validatedData['cantidad2'] ?? null,
+            'pedido1'             => $validatedData['pedido1'] ?? null,
+            'pedido2'             => $validatedData['pedido2'] ?? null,
+            'matricula_camion'    => $validatedData['matricula_camion'],
+            'inicio'              => $validatedData['inicio'],
+            'fin'                 => $validatedData['fin'],
+            'aduana'              => $validatedData['aduana'] ?? false,
+            'notas'               => $validatedData['notas'] ?? null,
+            'telefono'            => $validatedData['telefono'] ?? null,
+            'duracion'            => $validatedData['duracion'],
+        ];
+
+        if ($isFargaAdmin && $request->boolean('admin_override')) {
+            $updateData['es_replanificada'] = true;
+        } elseif ($reserva->es_replanificada) {
+            // Si ya es replanificada, mantenemos el flag
+            $updateData['es_replanificada'] = true;
+        } else {
+            $updateData['es_replanificada'] = false;
+        }
 
         // 3️⃣ Archivos adjuntos
         if ($request->hasFile('archivos')) {
@@ -555,26 +600,7 @@ class ReservaController extends Controller
         }
 
         // 4️⃣ Actualizar reserva
-        $reserva->update([
-            'tipo_camion_id'      => $validatedData['tipo_camion_id'],
-            'material1_id'   => $validatedData['material1_id'],
-            'material2_id'   => $validatedData['material2_id'] ?? null,
-            'proveedor_id'        => $validatedData['proveedor_id'],
-            'transportista_id'    => $validatedData['transportista_id'] ?? null,
-            'muelle_id'          => $validatedData['muelle_id'],
-            'estado_id'           => $validatedData['estado_id'],
-            'cantidad1'           => $validatedData['cantidad1'],
-            'cantidad2'           => $validatedData['cantidad2'] ?? null,
-            'pedido1'           => $validatedData['pedido1'] ?? null,
-            'pedido2'           => $validatedData['pedido2'] ?? null,
-            'matricula_camion'    => $validatedData['matricula_camion'],
-            'inicio'             => $validatedData['inicio'],
-            'fin'                => $validatedData['fin'],
-            'aduana'           => $validatedData['aduana'] ?? false,
-            'notas'               => $validatedData['notas'] ?? null,
-            'telefono'                => $validatedData['telefono'] ?? null,
-            'duracion'           => $validatedData['duracion'],
-        ]);
+        $reserva->update($updateData);
 
         // 5️⃣ Enviar email de actualización (temporalmente: solo si lo modifica el usuario externo creador)
         if ($isExternal) {
