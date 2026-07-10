@@ -45,7 +45,7 @@ class TransportistaController extends Controller
     {
         $entidad = Entidad::create($request->validated()['entidad']);
         
-        $entidad->transportista()->create([
+        $entidad->Carrier()->create([
             'puede_gestionar' => $request->validated()['puede_gestionar'],          
         ]);
         return response()->json([
